@@ -1,35 +1,36 @@
 # 🏫 SpaceBook – Smart Campus Booking & QR Check-in
 
 ระบบจองห้อง/อุปกรณ์ภายในมหาวิทยาลัย พร้อมระบบอนุมัติ
-และ Check-in ด้วย QR Code
-(โปรเจกต์วิชา Software Design and Development 2 – KMITL)
+และเช็กอินด้วย QR Code
+(โปรเจกต์วิชา SDD2 — สจล.)
 
-## ✨ Features
-- เข้าสู่ระบบแยกบทบาท (นักศึกษา / เจ้าหน้าที่ / แอดมิน)
-- จัดการข้อมูลห้องและอุปกรณ์
-- ค้นหาและตรวจสอบตารางว่าง
-- สร้างคำขอจอง + ระบบป้องกันการจองซ้ำ
-- อนุมัติ / ปฏิเสธคำขอจอง
-- QR Code สำหรับ Check-in / Check-out
-- Dashboard สรุปสถิติการใช้งาน
+## การติดตั้งและรันโปรเจกต์
 
-## 🛠 Tech Stack
-- Python 3.11+
-- Django / FastAPI
-- SQLite / PostgreSQL
+1. สร้าง virtual environment แล้ว activate
+   - Git Bash: `source venv/Scripts/activate`
+   - cmd: `venv\Scripts\activate`
+2. `pip install -r requirements.txt`
+3. (ไม่บังคับ) ก๊อป `.env.example` เป็น `.env`
+4. `python manage.py makemigrations accounts`
+5. `python manage.py migrate`
+6. `python manage.py runserver`
+
+## สมาชิกในกลุ่ม
+
+| ชื่อ | รหัส | หน้าที่ |
+| --- | --- | --- |
+| Pootanapat | 68030231 | PM + Booking Logic |
+| ... | ... | Auth + User |
+| ... | ... | Facility |
+| ... | ... | Booking + Approval |
+| ... | ... | QR + Check-in |
+| ... | ... | Dashboard + Testing |
+
+## Tech Stack
+
+- Python + Django
+- SQLite
 - Bootstrap 5
-- qrcode, pytest
+- qrcode
 
-## 👥 Team Members
-| ชื่อ | หน้าที่ |
-| --- | --- |
-| Pootanapat | PM + Booking Logic |
-| ... | Auth + User |
-| ... | Facility Management |
-| ... | Booking + Approval |
-| ... | QR + Check-in |
-| ... | Dashboard + Testing |
-
-## 🚀 Getting Started
-pip install -r requirements.txt
-python manage.py runserver
+ดูกฎการทำงานร่วมกันที่ `CONTRIBUTING.md`
