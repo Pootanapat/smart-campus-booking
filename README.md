@@ -27,7 +27,7 @@
 | ... | Auth + User |
 | ... | Facility Management |
 | ... | Booking + Approval |
-| ... | QR + Check-in |
+| Teekathat | QR + Check-in |
 | ... | Dashboard + Testing |
 
 ## 🚀 Getting Started
