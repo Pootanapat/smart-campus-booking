@@ -28,7 +28,7 @@
 | Napat | Facility Management |
 | ... | Booking + Approval |
 | Teekathat | QR + Check-in |
-| ... | Dashboard + Testing |
+| Nattaphop| Dashboard + Testing |
 
 ## 🚀 Getting Started
 pip install -r requirements.txt
