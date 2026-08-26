@@ -25,7 +25,7 @@
 | --- | --- |
 | Pootanapat | PM + Booking Logic |
 | ... | Auth + User |
-| ... | Facility Management |
+| Nattaphop | Facility Management |
 | ... | Booking + Approval |
 | ... | QR + Check-in |
 | ... | Dashboard + Testing |
