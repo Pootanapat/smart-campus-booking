@@ -24,7 +24,7 @@
 | ชื่อ | หน้าที่ |
 | --- | --- |
 | Pootanapat | PM + Booking Logic |
-| ... | Auth + User |
+| Chaonai | Auth + User |
 | Napat | Facility Management |
 | ... | Booking + Approval |
 | Teekathat | QR + Check-in |
