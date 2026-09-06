@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>{{ session.title }}</h1>
+<p>QR หมดอายุ: {{ session.expires_at }}</p>
+{% if not session.is_expired and session.is_active %}
+  <p><img src="{{ qr_url }}" alt="QR code สำหรับ {{ session.title }}"></p>
+{% endif %}
+{% if error %}<p>{{ error }}</p>{% endif %}
+{% if existing_checkin %}
+  <p>เช็กอินสำเร็จแล้ว</p>
+  <p>เวลา: {{ existing_checkin.checked_in_at }}</p>
+{% elif session.is_expired or not session.is_active %}
+  <p>QR นี้ไม่พร้อมใช้งาน</p>
+{% else %}
+  <form method="post">
+    {% csrf_token %}
+    <button type="submit">ยืนยันการเช็กอิน</button>
+  </form>
+{% endif %}
+{% endblock %}

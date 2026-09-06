@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>สร้าง QR Check-in</h1>
+{% if error %}<p>{{ error }}</p>{% endif %}
+<form method="post">
+  {% csrf_token %}
+  <p><label>ชื่อกิจกรรม<br><input name="title" required maxlength="200"></label></p>
+  <p><label>อายุ QR (นาที)<br><input name="duration" type="number" min="1" max="120" value="5" required></label></p>
+  <button type="submit">สร้าง QR</button>
+</form>
+{% endblock %}

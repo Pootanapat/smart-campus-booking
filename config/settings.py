@@ -23,6 +23,7 @@ INSTALLED_APPS = [
     "accounts",
     "facilities",
     "bookings",
+    "checkins",
 ]
 
 MIDDLEWARE = [

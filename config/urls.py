@@ -12,6 +12,7 @@ urlpatterns = [
     path("accounts/", include("accounts.urls")),
     path("facilities/", include("facilities.urls")),
     path("bookings/", include("bookings.urls")),
+    path("checkins/", include("checkins.urls")),
 ]
 
 # ให้เสิร์ฟไฟล์ media ตอนพัฒนา
