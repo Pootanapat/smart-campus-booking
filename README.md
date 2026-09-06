@@ -23,7 +23,7 @@
 | ... | ... | Auth + User |
 | ... | ... | Facility |
 | ... | ... | Booking + Approval |
-| ... | ... | QR + Check-in |
+| Teekathat | 68030107 | QR + Check-in |
 | ... | ... | Dashboard + Testing |
 
 ## Tech Stack
