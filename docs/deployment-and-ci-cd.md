@@ -118,4 +118,6 @@ Local Node server ส่ง security headers ที่ทดสอบไว้ �
 - Draft PR: [#3](https://github.com/Pootanapat/smart-campus-booking/pull/3)
 - GitHub CI สำเร็จบน review branch: [run 41058420995](https://github.com/Pootanapat/smart-campus-booking/actions/runs/41058420995), ตรวจผล metadata ได้จาก [github-ci.json](evidence/github-ci.json)
 - Pages-shaped build ทดสอบ local subpath `/smart-campus-booking/`, รูปห้องทั้ง 5, hash navigation, reload และ brand link จริง: [pages-build-local.json](evidence/pages-build-local.json)
-- Remote CD ให้ใช้ run และ installed URL ที่บันทึกหลัง merge สำเร็จแยกจากหลักฐานข้างต้น
+- Remote CD สำเร็จจริง: [run 41059099454](https://github.com/Pootanapat/smart-campus-booking/actions/runs/41059099454), installed URL https://pootanapat.github.io/smart-campus-booking/, revision `6d753268cb1d93a5a64464b19acfcc07785fcdc2` — [artifact JSON](evidence/pages-deployment.json), [live browser checks](evidence/live-browser.json)
+
+Pages เปิดเป็น workflow source แล้ว และ PR #3 merge ตามการอนุมัติของเจ้าของงาน Local installation เป็นหลักฐานคนละ environment กับผล remote ข้างต้น ภาพ [desktop](evidence/live-desktop.png) และ [mobile](evidence/live-mobile.png) เก็บจาก deployed URL จริง หลักฐานนี้ผูกกับ revision/run ที่ระบุ; เอกสารอาจถูกปรับหลัง deployment นั้น และ workflow จะสร้างหลักฐานใหม่ต่อการ deploy ทุกครั้ง

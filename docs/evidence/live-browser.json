@@ -1,0 +1,29 @@
+{
+  "environment": "github-pages-live-browser",
+  "url": "https://pootanapat.github.io/smart-campus-booking/",
+  "revision": "6d753268cb1d93a5a64464b19acfcc07785fcdc2",
+  "checkedAt": "2026-10-30T13:02:20.531Z",
+  "checks": [
+    {
+      "viewport": "desktop",
+      "rootStatus": 200,
+      "rooms": 5,
+      "photosLoaded": true,
+      "keyboardBooking": true,
+      "hashNavigationAndReload": true,
+      "noPageOverflow": true,
+      "pageErrors": []
+    },
+    {
+      "viewport": "mobile",
+      "rootStatus": 200,
+      "rooms": 5,
+      "photosLoaded": true,
+      "keyboardBooking": true,
+      "hashNavigationAndReload": true,
+      "noPageOverflow": true,
+      "pageErrors": []
+    }
+  ],
+  "passed": true
+}

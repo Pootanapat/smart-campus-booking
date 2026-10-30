@@ -93,3 +93,11 @@ npm run smoke:deployment
 Local installed preview: `http://127.0.0.1:5190`; หลักฐาน smoke อยู่ใน `docs/evidence/local-deployment.json` ส่วน `.github/workflows/ci-cd.yml` เตรียม CI สำหรับทุก push/PR และ Pages CD หลัง main ผ่าน checks ต้องเปิด Pages source เป็น GitHub Actions และมี remote run/deployed URL จริงก่อนอ้างว่าติดตั้งสำเร็จบน GitHub
 
 Security additions ได้แก่ runtime type/length limits, persisted schema/count/byte limits, stored-XSS regression, safe calendar escaping/UTF-8 folding, static response headers และ SHA-pinned/least-privilege Actions ดูข้อจำกัดเรื่อง mock role/PII/localStorage ใน Threat Model ก่อนใช้ข้อมูลจริง
+
+## Verified public deployment
+
+เว็บไซต์: [KMITL Room Booking](https://pootanapat.github.io/smart-campus-booking/)
+
+PR [#3](https://github.com/Pootanapat/smart-campus-booking/pull/3) merge ตามการอนุญาตของเจ้าของงานแล้ว ผล CI, Pages build, deploy และ HTTPS/revision verification ผ่านจริงใน [Actions run 41059099454](https://github.com/Pootanapat/smart-campus-booking/actions/runs/41059099454) สำหรับ revision `6d753268cb1d93a5a64464b19acfcc07785fcdc2` ดู [artifact](docs/evidence/pages-deployment.json) และ [live desktop/mobile checks](docs/evidence/live-browser.json)
+
+นี่เป็นหลักฐานของ revision ที่ระบุ ไม่ใช่การอ้างว่าการแก้เอกสารภายหลังอยู่ใน deployment เดิม ทุก deployment ใหม่ตรวจ revision และสร้าง artifact ของตนเอง ยังต้องยืนยัน Python/PEP 8 กับอาจารย์ และเก็บ feature contribution/peer review จริงของทีมเพิ่มเติม
