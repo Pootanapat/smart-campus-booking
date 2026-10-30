@@ -112,3 +112,10 @@ Local Node server ส่ง security headers ที่ทดสอบไว้ �
 - [GitHub Pages custom workflows](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages)
 - [GitHub Node.js CI](https://docs.github.com/en/actions/tutorials/build-and-test-code/nodejs)
 - [Vite Static Deployment](https://vite.dev/guide/static-deploy.html#github-pages)
+
+## หลักฐานที่เกิดขึ้นแล้วในชุดงานนี้
+
+- Draft PR: [#3](https://github.com/Pootanapat/smart-campus-booking/pull/3)
+- GitHub CI สำเร็จบน review branch: [run 41058420995](https://github.com/Pootanapat/smart-campus-booking/actions/runs/41058420995), ตรวจผล metadata ได้จาก [github-ci.json](evidence/github-ci.json)
+- Pages-shaped build ทดสอบ local subpath `/smart-campus-booking/`, รูปห้องทั้ง 5, hash navigation, reload และ brand link จริง: [pages-build-local.json](evidence/pages-build-local.json)
+- Remote CD ให้ใช้ run และ installed URL ที่บันทึกหลัง merge สำเร็จแยกจากหลักฐานข้างต้น

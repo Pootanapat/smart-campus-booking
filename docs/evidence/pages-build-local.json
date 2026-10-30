@@ -1,0 +1,14 @@
+{
+  "environment": "local-pages-build",
+  "checkedAt": "2026-10-30T12:53:10.314Z",
+  "basePath": "/smart-campus-booking/",
+  "checks": [
+    "five rooms render",
+    "all five room photos load under repository base path",
+    "hash navigation",
+    "reload booking route",
+    "brand returns to home"
+  ],
+  "passed": true,
+  "note": "Local verification of Pages-shaped build; not a remote deployment."
+}

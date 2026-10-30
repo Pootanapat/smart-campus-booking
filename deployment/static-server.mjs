@@ -20,7 +20,9 @@ const mime = {
   '.jpg': 'image/jpeg',
   '.png': 'image/png',
 };
-export function createStaticServer(directory) {
+export function createStaticServer(directory, basePath = '/') {
+  if (!basePath.startsWith('/') || !basePath.endsWith('/') || basePath.split('/').includes('..'))
+    throw new Error('Invalid mount path');
   const root = resolve(directory);
   return createServer(async (req, res) => {
     for (const [name, value] of Object.entries(securityHeaders)) res.setHeader(name, value);
@@ -31,7 +33,15 @@ export function createStaticServer(directory) {
       return;
     }
     try {
-      const pathname = decodeURIComponent(new URL(req.url, 'http://localhost').pathname);
+      let pathname = decodeURIComponent(new URL(req.url, 'http://localhost').pathname);
+      if (basePath !== '/') {
+        if (!pathname.startsWith(basePath)) {
+          res.writeHead(404);
+          res.end('Not found');
+          return;
+        }
+        pathname = pathname.slice(basePath.length - 1);
+      }
       const parts = pathname.split('/');
       if (
         pathname.includes('\0') ||
