@@ -3,7 +3,7 @@ test.beforeEach(async ({ page }) => {
   await page.addInitScript(() => localStorage.setItem('kmitl-tour', '1'));
   await page.goto('/');
 });
-test('starts empty, filters rooms, and loads/clears demo data', async ({ page }) => {
+test('เริ่มว่าง กรองห้อง และโหลดหรือล้างข้อมูลตัวอย่าง', async ({ page }) => {
   await expect(page.locator('.room-row')).toHaveCount(5);
   await expect(page.locator('.booking-block')).toHaveCount(0);
   await page.getByLabel('ค้นหาห้องประชุม', { exact: true }).fill('Bunnag');
@@ -17,7 +17,7 @@ test('starts empty, filters rooms, and loads/clears demo data', async ({ page })
   await page.getByRole('button', { name: 'ยืนยัน', exact: true }).click();
   await expect(page.locator('.booking-block')).toHaveCount(0);
 });
-test('creates a booking, persists it, exports, edits and cancels', async ({ page }) => {
+test('สร้าง บันทึกถาวร ส่งออก แก้ไข และยกเลิกการจอง', async ({ page }) => {
   await page.getByRole('button', { name: 'จองห้องประชุม', exact: true }).click();
   const dialog = page.getByRole('dialog');
   await dialog.locator('input[type=date]').fill('2099-01-20');
@@ -46,7 +46,7 @@ test('creates a booking, persists it, exports, edits and cancels', async ({ page
   await page.getByRole('button', { name: 'ยืนยัน', exact: true }).click();
   await expect(page.locator('.booking-status')).toHaveText('ยกเลิกแล้ว');
 });
-test('supports keyboard booking and has no page overflow', async ({ page }) => {
+test('รองรับการจองด้วยคีย์บอร์ดและหน้าจอไม่ล้น', async ({ page }) => {
   await page.getByLabel('วันที่แสดงห้องประชุม').fill('2099-01-20');
   const slot = page.getByRole('button', { name: 'บุนนาค 09:00 คลิกเพื่อจอง', exact: true });
   await slot.focus();
@@ -59,7 +59,7 @@ test('supports keyboard booking and has no page overflow', async ({ page }) => {
   );
   await page.screenshot({ path: `test-results/${test.info().project.name}.png`, fullPage: true });
 });
-test('drag selects half-hours, filters capacity, and toggles dark mode', async ({ page }) => {
+test('ลากเลือกครึ่งชั่วโมง กรองความจุ และเปลี่ยนโหมดมืด', async ({ page }) => {
   await page.getByLabel('วันที่แสดงห้องประชุม').fill('2099-01-20');
   await page
     .getByRole('button', { name: 'บุนนาค 10:00 คลิกเพื่อจอง', exact: true })
@@ -71,7 +71,7 @@ test('drag selects half-hours, filters capacity, and toggles dark mode', async (
   const b = await page
     .getByRole('button', { name: 'บุนนาค 10:00 คลิกเพื่อจอง', exact: true })
     .boundingBox();
-  if (!a || !b) throw new Error('Missing timeline slots');
+  if (!a || !b) throw new Error('ไม่พบช่องเวลาในตาราง');
 
   await page.mouse.move(a.x + a.width / 2, a.y + a.height / 2);
   await page.mouse.down();
@@ -91,7 +91,7 @@ test('drag selects half-hours, filters capacity, and toggles dark mode', async (
   await expect(page.locator('html')).toHaveClass('dark');
 });
 
-test('SR-03 renders hostile booking text without creating executable markup', async ({ page }) => {
+test('SR-03 แสดงข้อความอันตรายเป็นข้อความโดยไม่สร้าง HTML ที่ทำงานได้', async ({ page }) => {
   const hostile = '<img src=x onerror="window.__xss=1">';
   await page.evaluate(
     (purpose) =>

@@ -12,7 +12,7 @@ export const blank = (date: string, roomId = '701', start = 540, end = 600): Boo
   attendees: 1,
   notes: '',
 });
-/** Explicit showcase fixtures; never loaded automatically or used for normal saves. */
+/** ข้อมูลตัวอย่างสำหรับสาธิต โหลดเมื่อสั่งเท่านั้นและไม่ใช้แทนการบันทึกทั่วไป */
 export function createDemoBookings(
   date: string,
   existing: readonly Booking[],

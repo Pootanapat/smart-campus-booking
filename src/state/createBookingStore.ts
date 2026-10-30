@@ -13,7 +13,7 @@ export interface BookingState {
   demo: (date: string) => string;
   setRole: (role: string) => void;
 }
-/** Zustand is an in-memory view of use-case results, with no persistence middleware. */
+/** Zustand เก็บผลกรณีใช้งานในหน่วยความจำ โดยไม่ใช้ middleware จัดเก็บถาวร */
 export function createBookingStore(service: BookingService, preferences: PreferencesService) {
   let initialBookings: Booking[] = [];
   let storageError = '';

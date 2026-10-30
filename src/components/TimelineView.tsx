@@ -23,6 +23,13 @@ import type { Booking, BookingDraft as Draft } from '../types/booking';
 import { cn } from '../utils/cn';
 import { slots, thaiDate, time, today } from '../utils/dateTime';
 
+const equipmentLabels: Record<string, string> = {
+  Projector: 'โปรเจกเตอร์',
+  Computer: 'คอมพิวเตอร์',
+  Microphone: 'ไมโครโฟน',
+  'Wi-Fi': 'Wi-Fi',
+};
+
 export function TimelineView({
   bookings,
   date,
@@ -158,7 +165,7 @@ export function TimelineView({
                       )
                     }
                   />
-                  {e}
+                  {equipmentLabels[e]}
                 </label>
               ))}
               <small>Wi-Fi: ยังไม่มีข้อมูลยืนยันจากต้นฉบับ</small>
@@ -234,7 +241,7 @@ export function TimelineView({
         )}
         {equipment.map((e) => (
           <button key={e} onClick={() => setEquipment(equipment.filter((x) => x !== e))}>
-            {e}
+            {equipmentLabels[e]}
             <X size={12} />
           </button>
         ))}
@@ -275,7 +282,7 @@ export function TimelineView({
         <div className="timeline">
           <div className="timeline-head">
             <div>
-              ห้องประชุม <span>/ MEETING ROOM</span>
+              ห้องประชุม <span>/ ตารางการใช้งาน</span>
             </div>
             <div className="hour-labels">
               {Array.from({ length: 11 }, (_, i) => (

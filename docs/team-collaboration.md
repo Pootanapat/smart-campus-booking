@@ -1,10 +1,10 @@
-# Team Collaboration Workflow และหลักฐาน Git
+# กระบวนการทำงานร่วมกันของทีม และหลักฐาน Git
 
 Repository: [Pootanapat/smart-campus-booking](https://github.com/Pootanapat/smart-campus-booking)
 
 ## ประวัติที่ตรวจพบจริงก่อนชุดปรับเกณฑ์นี้
 
-ตรวจจาก remote `main` ที่ commit `9598b8d` ไม่ใช่ประวัติที่สร้างย้อนหลังเพื่อให้คะแนน
+ตรวจจาก ระยะไกล `main` ที่ commit `9598b8d` ไม่ใช่ประวัติที่สร้างย้อนหลังเพื่อให้คะแนน
 
 | Commit                                                                       | Author ตาม Git | Message                                            | สิ่งที่ใช้ยืนยันได้                                |
 | ---------------------------------------------------------------------------- | -------------- | -------------------------------------------------- | -------------------------------------------------- |
@@ -17,7 +17,7 @@ Repository: [Pootanapat/smart-campus-booking](https://github.com/Pootanapat/smar
 
 มี 5 author ที่ตรวจพบในประวัติเดิม แต่ไม่อนุมานว่าเป็น feature contribution ครบ 6 คน และไม่อ้างชื่อ author ว่าคือผู้ review โดยอัตโนมัติ การปรับครั้งนี้ทำด้วยความช่วยเหลือของ Codex; commit ผู้ใช้หนึ่งคนไม่ใช่หลักฐานการกระจายงานของทั้งทีม
 
-## Branching Strategy: Feature Branching
+## แนวทางแยกสาขางานตามคุณลักษณะ (Feature Branching)
 
 ```mermaid
 gitGraph
@@ -42,12 +42,12 @@ gitGraph
 2. สมาชิกแตก branch จาก main ล่าสุด ทำงานที่ได้รับมอบหมาย และ commit ด้วยบัญชีตนเอง
 3. เปิด PR พร้อม problem/result, code changes, test output และ risk/trade-off ใช้ `.github/pull_request_template.md`
 4. ให้เพื่อนอย่างน้อย 1 คน review โดยดู correctness, responsibilities/SOLID, unsafe data handling และ tests
-5. ผู้เขียนแก้ feedback; reviewer ตรวจ revision ล่าสุดและให้ review จริง
-6. CI ต้องผ่านก่อน merge จากนั้น Pages CD ติดตั้ง revision บน main และเก็บ installed URL/artifact
+5. ผู้เขียนแก้ feedback; ผู้ตรวจโค้ด ตรวจ revision ล่าสุดและให้ review จริง
+6. CI ต้องผ่านก่อน merge จากนั้น Pages CD ติดตั้ง revision บน main และเก็บ URL ที่ติดตั้ง/artifact
 
-แนะนำให้ตั้ง branch protection ของ main: require pull request, 1 approval, required status check `Quality, Security and Browser Tests`, ห้าม force push และห้ามลบ branch หลัก การมีเอกสารนี้ยังไม่ได้แปลว่าเปิด protection แล้ว
+แนะนำให้ตั้ง branch protection ของ main: require pull request, 1 approval, required status check `ตรวจคุณภาพ ความปลอดภัย และเบราว์เซอร์`, ห้าม force push และห้ามลบ branch หลัก การมีเอกสารนี้ยังไม่ได้แปลว่าเปิด protection แล้ว
 
-## Meaningful Commit Messages
+## ข้อความ commit ที่สื่อความหมาย
 
 ตัวอย่างข้อความสำหรับงานที่จะทำจริง:
 
@@ -61,13 +61,13 @@ ci: verify production build before publishing GitHub Pages
 
 ตัวอย่างไม่ใช่ commit ที่อ้างว่าเกิดขึ้นแล้ว ห้ามเปลี่ยนชื่อ author, backdate หรือแบ่ง commit เปล่าเพื่อแสดง contribution
 
-## Work Packages เสนอสำหรับทีม 6 คน
+## ชุดงาน เสนอสำหรับทีม 6 คน
 
 | Work package           | งานที่สามารถรับผิดชอบและเปิด PR จริง                      | หลักฐานที่ต้องเก็บ                     |
 | ---------------------- | --------------------------------------------------------- | -------------------------------------- |
-| 1 Booking/domain       | ตรวจ overlap/cutoff และเพิ่มกรณี edge ที่ยังขาด           | commit/test/PR/review URL              |
+| 1 Booking/domain       | ตรวจ overlap/จุดตัดเวลายกเลิก และเพิ่มกรณี edge ที่ยังขาด | commit/test/PR/review URL              |
 | 2 Persistence/security | วิเคราะห์ valid tampering และออกแบบ future auth boundary  | threat/repository test PR              |
-| 3 UI/accessibility     | ทดสอบ form/keyboard/mobile และแก้ปัญหาที่พบ               | issue/screenshot/browser test PR       |
+| 3 UI/accessibility     | ทดสอบ form/keyboard/mobile และแก้ปัญหาที่พบ               | issue/ภาพหน้าจอ/เบราว์เซอร์ test PR    |
 | 4 Calendar/export      | ตรวจ timezone/long Thai text และ calendar client behavior | test/demo/PR                           |
 | 5 CI/CD                | เปิด Pages/branch protection และตรวจ installed revision   | run URL/commit SHA/deployment artifact |
 | 6 QA/presentation      | ไล่ traceability และซ้อม failure/demo scenarios           | review record/demo checklist PR        |

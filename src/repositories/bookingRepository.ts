@@ -2,14 +2,14 @@ import { assertBookingCollection, MAX_STORAGE_BYTES } from '../security/bookingB
 import type { Booking } from '../types/booking';
 import type { BookingRepository, StorageAdapter } from '../types/contracts';
 export const BOOKING_STORAGE_KEY = 'kmitl-booking-v1';
-/** Preserves the original Zustand envelope and unknown fields for existing users. */
+/** รักษาโครงข้อมูล Zustand เดิมและเขตข้อมูลเพิ่มเติมเพื่อคงความเข้ากันได้ */
 export class LocalStorageBookingRepository implements BookingRepository {
   constructor(private readonly storage: StorageAdapter) {}
   private readEnvelope(): { state: Record<string, unknown>; version: number } {
     const raw = this.storage.getItem(BOOKING_STORAGE_KEY);
     if (raw === null) return { state: { bookings: [] }, version: 0 };
     if (new TextEncoder().encode(raw).length > MAX_STORAGE_BYTES)
-      throw new Error('Saved data exceeds limit');
+      throw new Error('ข้อมูลที่บันทึกไว้เกินขนาดกำหนด');
     const value: unknown = JSON.parse(raw);
     if (
       !value ||
@@ -18,11 +18,11 @@ export class LocalStorageBookingRepository implements BookingRepository {
       !value.state ||
       typeof value.state !== 'object'
     ) {
-      throw new Error('Invalid saved booking data');
+      throw new Error('ข้อมูลการจองที่บันทึกไว้ไม่ถูกต้อง');
     }
     const envelope = value as { state: Record<string, unknown>; version?: number };
     if (envelope.version !== undefined && envelope.version !== 0)
-      throw new Error('Unsupported booking data version');
+      throw new Error('ไม่รองรับเวอร์ชันข้อมูลการจองนี้');
     assertBookingCollection(envelope.state.bookings);
     return { state: envelope.state, version: 0 };
   }
@@ -34,11 +34,11 @@ export class LocalStorageBookingRepository implements BookingRepository {
     const envelope = this.readEnvelope();
     const serialized = JSON.stringify({ ...envelope, state: { ...envelope.state, bookings } });
     if (new TextEncoder().encode(serialized).length > MAX_STORAGE_BYTES)
-      throw new Error('Saved data exceeds limit');
+      throw new Error('ข้อมูลที่บันทึกไว้เกินขนาดกำหนด');
     this.storage.setItem(BOOKING_STORAGE_KEY, serialized);
   }
 }
-/** Independent implementation used to verify repository substitutability. */
+/** ตัวจัดเก็บอีกแบบสำหรับตรวจว่ารักษาสัญญาและใช้แทน repository ได้ */
 export class MemoryBookingRepository implements BookingRepository {
   private bookings: Booking[] = [];
   getAll(): Booking[] {

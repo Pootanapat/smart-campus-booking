@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { once } from 'node:events';
 import { createStaticServer } from './static-server.mjs';
-test('static deployment serves SPA routes with security headers and rejects private paths', async () => {
+test('ระบบติดตั้งให้บริการเส้นทาง SPA พร้อม headers ความปลอดภัยและปฏิเสธเส้นทางส่วนตัว', async () => {
   const directory = await mkdtemp(join(tmpdir(), 'kmitl-static-'));
   await writeFile(join(directory, 'index.html'), '<div id="root"></div>');
   const server = createStaticServer(directory);

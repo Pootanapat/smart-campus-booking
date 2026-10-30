@@ -1,4 +1,4 @@
-/** Compatibility entry point for existing domain consumers; no browser infrastructure. */
+/** ทางเข้าเพื่อคงความเข้ากันได้กับผู้ใช้โมดูลโดเมนเดิม โดยไม่ผูกกับโครงสร้างพื้นฐานเบราว์เซอร์ */
 export { canCancel, conflict } from './domain/bookingRules';
 export { rooms } from './domain/rooms';
 export type { Booking, BookingDraft, BookingInput, Room } from './types/booking';

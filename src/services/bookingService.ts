@@ -5,7 +5,7 @@ import type { BookingRepository, BookingValidator } from '../types/contracts';
 import { isValidDate } from '../utils/dateTime';
 export type BookingResult =
   { bookings: Booking[]; error: '' } | { error: string; bookings?: never };
-/** Application use cases know contracts, not React, Zustand, localStorage, or DOM APIs. */
+/** กรณีใช้งานอ้างอิงสัญญา ไม่ผูกกับ React, Zustand, localStorage หรือ DOM API */
 export class BookingService {
   constructor(
     private readonly repository: BookingRepository,
@@ -38,7 +38,7 @@ export class BookingService {
         return { error: 'ไม่พบรายการจองที่ต้องการแก้ไข' };
       const error = this.validator.validate(input, bookings, editingId);
       if (error) return { error };
-      // Pick domain fields explicitly: a UI draft can contain an id or other UI-only fields.
+      // เลือกเขตข้อมูลโดเมนโดยตรง เพราะข้อมูลร่างอาจมี id หรือข้อมูลเฉพาะหน้าจอปะปน
       const {
         roomId,
         date,

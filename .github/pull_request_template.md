@@ -1,20 +1,20 @@
-## Problem and resulting behavior
+## ปัญหาและพฤติกรรมหลังแก้ไข
 
-Describe the concrete problem and the implemented change.
+อธิบายปัญหาที่เกิดขึ้นจริงและสิ่งที่เปลี่ยนหลังแก้ไข
 
-## Rubric and traceability
+## เกณฑ์และการตรวจสอบย้อนกลับ
 
-List requirement IDs (FR / SR / T / R) from docs/traceability-matrix.md and docs/threat-model.md.
+ระบุรหัส FR / SR / T / R ที่เกี่ยวข้องจาก docs/traceability-matrix.md และ docs/threat-model.md
 
-## Validation evidence
+## หลักฐานการตรวจสอบ
 
-Paste actual command results and relevant Actions run URLs. Do not mark unexecuted checks as passed.
+แนบผลคำสั่งที่รันจริงและ URL ของ GitHub Actions ที่เกี่ยวข้อง ไม่ระบุว่าสำเร็จหากยังไม่ได้รัน
 
-## Review checklist
+## รายการตรวจโค้ด
 
-- [ ] Responsibilities and dependencies remain focused; diagram/documentation changes match implementation.
-- [ ] User-controlled data stays as text; validation is enforced in the service/domain boundary.
-- [ ] No passwords, tokens, or real personal data are committed.
-- [ ] Existing tests are retained; new behavior has meaningful tests.
-- [ ] Risks, limitations, and migration/deployment impacts are documented.
-- [ ] A teammate reviewed this PR; link their actual review.
+- [ ] หน้าที่และ dependency ยังชัดเจน แผนภาพ/เอกสารตรงกับโค้ด
+- [ ] ข้อมูลจากผู้ใช้แสดงเป็นข้อความ และตรวจสอบที่ขอบเขตบริการ/โดเมน
+- [ ] ไม่มีรหัสผ่าน token หรือข้อมูลส่วนบุคคลจริงถูกบันทึกใน repository
+- [ ] คงชุดทดสอบเดิมไว้ และพฤติกรรมใหม่มีการทดสอบที่เหมาะสม
+- [ ] อธิบายความเสี่ยง ข้อจำกัด และผลต่อข้อมูลเดิม/การติดตั้ง
+- [ ] มีเพื่อนร่วมทีมตรวจ PR นี้จริง และแนบ URL การตรวจ

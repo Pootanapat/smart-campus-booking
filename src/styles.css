@@ -2220,3 +2220,13 @@ footer b {
 .toolbar {
   backdrop-filter: blur(20px);
 }
+
+/* ข้อความภาษาไทยไม่เพิ่มช่องไฟระหว่างตัวอักษรแบบหัวข้อภาษาอังกฤษ */
+.hero-tag,
+.eyebrow,
+.hero-corner,
+.nav-label,
+.support-strip > span,
+.brand b {
+  letter-spacing: normal;
+}

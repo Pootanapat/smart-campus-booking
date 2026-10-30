@@ -1,7 +1,8 @@
-# Implementation notes
+# แนวทางการออกแบบหน้าจอ
 
-- Purple #6B21A8 and gold #D97706 are the visual anchors. Thai and Latin type use IBM Plex Sans Thai and Manrope with system fallbacks.
-- Main timeline keeps consistent half-hour geometry and scrolls horizontally on narrow devices. Desktop uses a fixed sidebar; mobile uses a bottom navigation bar.
-- Motion is implemented through motion/react. Global reduced-motion preferences are respected. Dialog focus trapping, Escape dismissal, and focus restoration use Radix primitives.
-- Local browser persistence and validation are implemented in separate store/domain modules. Domain tests cover overlaps, adjacent bookings, cancelled entries, edits, invalid input, capacity, and the cancellation cutoff.
-- A browser workflow suite covers initial empty state, filters, demo/reset, persistence, booking/edit/cancel, ICS downloads, keyboard access, and viewport overflow on desktop and mobile.
+- ใช้สีม่วง #6B21A8 และสีทอง #D97706 เป็นสีหลัก แบบอักษรไทยใช้ IBM Plex Sans Thai ส่วนอักษรละตินใช้ Manrope พร้อมแบบอักษรสำรองของระบบ
+- ตารางหลักแบ่งช่องเวลาครั้งละ 30 นาทีอย่างสม่ำเสมอ และเลื่อนแนวนอนบนหน้าจอแคบ คอมพิวเตอร์ใช้แถบด้านข้าง ส่วนมือถือใช้เมนูด้านล่าง
+- ใช้ motion/react สำหรับภาพเคลื่อนไหวและเคารพการตั้งค่าลดการเคลื่อนไหวของผู้ใช้ ใช้ Radix จัดการโฟกัส การปิดด้วย Escape และการคืนโฟกัสเมื่อปิดกล่องโต้ตอบ
+- แยกกฎตรวจสอบ สถานะ และการจัดเก็บในเบราว์เซอร์เป็นคนละส่วน ชุดทดสอบครอบคลุมเวลาทับซ้อน เวลาต่อกัน รายการยกเลิก การแก้ไข ข้อมูลผิด ความจุ และเงื่อนไขยกเลิก
+- ชุดทดสอบเบราว์เซอร์ครอบคลุมสถานะเริ่มต้นว่าง ตัวกรอง ข้อมูลตัวอย่าง/ล้างข้อมูล การบันทึกถาวร การจอง/แก้ไข/ยกเลิก การดาวน์โหลด ICS การใช้คีย์บอร์ด และหน้าจอคอมพิวเตอร์/มือถือ
+- ข้อความสำหรับผู้ใช้เป็นภาษาไทย คงชื่อผลิตภัณฑ์ ตัวย่อมาตรฐาน ชื่อโค้ด คีย์จัดเก็บ และสัญญา API ที่จำเป็นไว้ตามเดิม ไม่เพิ่มช่องไฟแบบอักษรละตินให้หัวข้อภาษาไทย

@@ -5,7 +5,7 @@ import { execFileSync } from 'node:child_process';
 const workspace = process.cwd();
 const output = resolve(workspace, '.deployment/current');
 if (!output.startsWith(resolve(workspace, '.deployment') + sep))
-  throw new Error('Invalid deployment target');
+  throw new Error('ตำแหน่งติดตั้งไม่ถูกต้อง');
 const html = await readFile('dist/index.html');
 let revision = 'uncommitted';
 try {
@@ -22,7 +22,7 @@ const evidence = {
   revision,
   indexSha256: createHash('sha256').update(html).digest('hex'),
   url: 'http://127.0.0.1:5190',
-  note: 'Local deployment only; not a GitHub Actions/CD execution record.',
+  note: 'เป็นการติดตั้งในเครื่องเท่านั้น ไม่ใช่หลักฐานการรัน GitHub Actions/CD',
 };
 await writeFile(resolve(output, 'deployment.json'), JSON.stringify(evidence, null, 2) + '\n');
 console.log(JSON.stringify(evidence, null, 2));

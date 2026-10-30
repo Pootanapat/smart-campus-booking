@@ -34,18 +34,18 @@ try {
     checkedAt: new Date().toISOString(),
     basePath,
     checks: [
-      'five rooms render',
-      'all five room photos load under repository base path',
-      'hash navigation',
-      'reload booking route',
-      'brand returns to home',
+      'แสดงห้องประชุม 5 ห้อง',
+      'รูปทั้ง 5 ห้องโหลดผ่านเส้นทางฐานของ repository',
+      'เปลี่ยนหน้าผ่าน hash',
+      'โหลดหน้ารายการจองซ้ำ',
+      'กดตราระบบกลับหน้าหลัก',
     ],
     passed: true,
-    note: 'Local verification of Pages-shaped build; not a remote deployment.',
+    note: 'ตรวจรูปแบบการสร้างสำหรับ Pages ในเครื่องเท่านั้น ไม่ใช่การติดตั้งระยะไกล',
   };
   await mkdir('docs/evidence', { recursive: true });
   await writeFile('docs/evidence/pages-build-local.json', JSON.stringify(evidence, null, 2) + '\n');
-  console.log('Pages subpath/hash build checks passed: 5');
+  console.log('การตรวจเส้นทางย่อยและ hash ของ Pages ผ่าน 5 จุด');
 } finally {
   await browser?.close();
   server.closeAllConnections();

@@ -5,7 +5,7 @@ import { Modal } from './Modal';
 export function TutorialDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
   const [step, setStep] = useState(0);
   return (
-    <Modal title="ยินดีต้อนรับสู่ KMITL Spaces" open={open} onClose={onClose}>
+    <Modal title="ยินดีต้อนรับสู่ระบบจองห้องประชุม" open={open} onClose={onClose}>
       <div className="tutorial">
         <div className="tour-icon">
           {step === 0 ? (

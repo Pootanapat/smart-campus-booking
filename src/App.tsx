@@ -92,7 +92,7 @@ export function App() {
           <div className="page-heading">
             <div>
               <div className="eyebrow">
-                <span /> KMITL MEETING SPACES
+                <span /> พื้นที่ประชุม KMITL
               </div>
               <h1>
                 {page === '/bookings'
@@ -145,10 +145,10 @@ export function App() {
             </div>
             <div>
               <strong>ห้องพร้อม อุปกรณ์พร้อม คุณก็พร้อม</strong>
-              <p>LCD Projector · คอมพิวเตอร์ · ชุดไมโครโฟนประชุม พร้อมให้บริการทุกห้อง</p>
+              <p>โปรเจกเตอร์ LCD · คอมพิวเตอร์ · ชุดไมโครโฟนประชุม พร้อมให้บริการทุกห้อง</p>
             </div>
             <span>
-              <span className="live-dot" /> 5 SPACES, ENDLESS POSSIBILITIES
+              <span className="live-dot" /> 5 ห้องประชุม พร้อมรองรับทุกไอเดีย
             </span>
           </section>
           <div className="demo-controls">
@@ -165,7 +165,7 @@ export function App() {
           </div>
           <footer>
             <span>
-              <b>KMITL</b> ROOM BOOKING<span className="footer-divider">|</span>
+              <b>KMITL</b> ระบบจองห้องประชุม<span className="footer-divider">|</span>
               สำนักงานบริหารงานทั่วไปและกิจการพิเศษ
             </span>
             <span>สงวนลิขสิทธิ์ © 2569 สำนักงานบริหารข้อมูลดิจิทัล</span>

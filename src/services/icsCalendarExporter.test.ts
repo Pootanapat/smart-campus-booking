@@ -16,8 +16,8 @@ const booking: Booking = {
   notes: 'line one\r\nline two\\end',
   status: 'confirmed',
 };
-describe('ICS serialization without browser APIs', () => {
-  it('exports Thailand local times as UTC with stable metadata', () => {
+describe('การสร้างข้อมูล ICS โดยไม่ใช้ API เบราว์เซอร์', () => {
+  it('ส่งออกเวลาไทยเป็น UTC พร้อมข้อมูลกำกับที่แน่นอน', () => {
     const file = new IcsCalendarExporter({ now: () => new Date('2030-01-01T00:00:00Z') }).export(
       booking,
     );

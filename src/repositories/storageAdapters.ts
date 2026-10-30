@@ -1,5 +1,5 @@
 import type { StorageAdapter } from '../types/contracts';
-/** Browser access stays at the infrastructure boundary. A supplier defers access until needed. */
+/** การเข้าถึงเบราว์เซอร์อยู่ที่ชั้นโครงสร้างพื้นฐาน และเรียกผู้จัดหาเมื่อจำเป็นเท่านั้น */
 export class BrowserStorageAdapter implements StorageAdapter {
   constructor(
     private readonly storage: () => Pick<Storage, 'getItem' | 'setItem'> = () =>

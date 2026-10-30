@@ -6,6 +6,12 @@ import { rooms } from '../domain/rooms';
 import type { Booking, BookingDraft as Draft } from '../types/booking';
 import { slots, thaiDate, time, today } from '../utils/dateTime';
 import { Modal } from './Modal';
+const roleLabels: Record<string, string> = {
+  student: 'นักศึกษา',
+  staff: 'บุคลากร',
+  admin: 'ผู้ดูแลระบบ',
+};
+
 export function BookingDialog({
   initialDraft,
   bookings,
@@ -56,7 +62,7 @@ export function BookingDialog({
           <div className="form-body">
             {review ? (
               <div className="review">
-                <span className="eyebrow">BOOKING SUMMARY</span>
+                <span className="eyebrow">สรุปรายละเอียดการจอง</span>
                 <h2>{draft.purpose}</h2>
                 <p>
                   ห้อง {rooms.find((r) => r.id === draft.roomId)?.name} ({draft.roomId})
@@ -73,7 +79,9 @@ export function BookingDialog({
                 <p>
                   {draft.attendees} คน · {draft.notes || 'ไม่มีคำขอเพิ่มเติม'}
                 </p>
-                <small>บทบาทจำลอง: {role} · บันทึกการจองในอุปกรณ์นี้</small>
+                <small>
+                  บทบาทจำลอง: {roleLabels[role] ?? 'ผู้ใช้งานจำลอง'} · บันทึกการจองในอุปกรณ์นี้
+                </small>
               </div>
             ) : (
               <>
@@ -87,7 +95,7 @@ export function BookingDialog({
                     >
                       {rooms.map((r) => (
                         <option key={r.id} value={r.id}>
-                          {r.id} {r.name} · {r.capacity} ที่นั่ง · Projector {r.projectors} จอ /
+                          {r.id} {r.name} · {r.capacity} ที่นั่ง · โปรเจกเตอร์ {r.projectors} จอ /
                           คอมพิวเตอร์ / ไมค์
                         </option>
                       ))}
