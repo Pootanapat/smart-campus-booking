@@ -29,7 +29,7 @@ flowchart LR
   APP <-->|JSON รายการจองและค่ากำหนด| LS[(localStorage)]
   APP -->|ICS / clipboard ที่ผู้ใช้สั่ง| FILE[ระบบไฟล์ / clipboard ของเครื่อง]
   HOST[โฮสต์: เซิร์ฟเวอร์ในเครื่องหรือ GitHub Pages] -->|HTML JS CSS รูปห้อง| APP
-  FONT[Google Fonts] -->|stylesheet / font| APP
+  FONT[Google Fonts] -->|รูปแบบและแบบอักษร| APP
   TEAM[สมาชิกทีม] -->|commit / PR| GH[GitHub repository / Actions]
   GH -->|ชุดไฟล์ที่ผ่านการตรวจ| HOST
 ```
@@ -54,18 +54,18 @@ flowchart TD
  end
  subgraph TB4[TB-4: แหล่งเก็บโค้ด สิทธิ์ CI และโฮสต์]
   R[GitHub commit / PR]
-  CI((Verify: format / audit / tests / build))
-  CD((Pages artifact / deploy / HTTPS smoke))
+  CI((ตรวจรูปแบบ ช่องโหว่ ชุดทดสอบ และสร้างไฟล์))
+  CD((ชุดไฟล์ Pages การติดตั้ง และการตรวจ HTTPS))
   H[ไฟล์เว็บไซต์บนโฮสต์]
  end
  E1 -->|F1: ข้อมูลแบบฟอร์มและคำสั่ง| P1
  P1 -->|F2: validate / save / cancel| P2
- P2 -->|F3: snapshot read / replace| P3
+ P2 -->|F3: อ่านหรือแทนที่สำเนาข้อมูล| P3
  P3 <-->|F4: JSON| D1
  P2 -->|F5: ผลลัพธ์หรือข้อผิดพลาด| P1
  P1 -->|F6: ส่งออกเมื่อผู้ใช้สั่ง| P4
  P4 -->|F7: ICS ที่เข้ารหัสข้อความ| E2
- E3 -->|F8: CSS / fonts| P1
+ E3 -->|F8: CSS และแบบอักษร| P1
  R -->|F9: โค้ดที่ตรวจแล้ว| CI
  CI -->|F10: ผ่านเงื่อนไขตรวจสอบ| CD
  CD -->|F11: ชุดไฟล์ติดตั้งและข้อมูลที่มา| H

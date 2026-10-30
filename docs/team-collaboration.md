@@ -21,10 +21,10 @@ Repository: [Pootanapat/smart-campus-booking](https://github.com/Pootanapat/smar
 
 ```mermaid
 gitGraph
-  commit id: "existing main"
+  commit id: "main เดิม"
   branch codex/rubric-alignment
   checkout codex/rubric-alignment
-  commit id: "implementation and rubric changes"
+  commit id: "พัฒนาและปรับตามเกณฑ์"
   checkout main
 ```
 

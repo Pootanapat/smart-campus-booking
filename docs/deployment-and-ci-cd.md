@@ -50,13 +50,13 @@ E2E_STATIC=1 npm run test:e2e
 
 ```mermaid
 flowchart LR
-  PUSH[Push / Pull Request] --> VERIFY[Verify: npm ci / format / audit / unit / deployment tests / build / browser tests]
-  VERIFY -->|only main and successful| BUILD[Build Pages: base path + hash router + provenance]
-  BUILD --> ART[Upload Pages artifact]
-  ART --> CD[OIDC deploy to github-pages environment]
-  CD --> SMOKE[HTTPS / JS asset / revision check]
-  SMOKE --> EVIDENCE[Run URL + Pages URL + deployment evidence artifact]
-  VERIFY -->|PR or feature branch| REVIEW[CI result for code review]
+  PUSH[ส่งโค้ดหรือเปิด PR] --> VERIFY[ตรวจ npm ci รูปแบบโค้ด ช่องโหว่ ชุดทดสอบ การสร้าง และเบราว์เซอร์]
+  VERIFY -->|เฉพาะ main ที่ผ่านการตรวจ| BUILD[สร้าง Pages พร้อมเส้นทางฐาน HashRouter และข้อมูลที่มา]
+  BUILD --> ART[บันทึกชุดไฟล์ Pages]
+  ART --> CD[ติดตั้งผ่าน OIDC ในสภาพแวดล้อม github-pages]
+  CD --> SMOKE[ตรวจ HTTPS ไฟล์ JavaScript และ revision]
+  SMOKE --> EVIDENCE[URL รอบการทำงาน เว็บไซต์ และชุดหลักฐาน]
+  VERIFY -->|PR หรือสาขางาน| REVIEW[ผล CI สำหรับตรวจโค้ด]
 ```
 
 ### เงื่อนไขผ่านการตรวจ CI
