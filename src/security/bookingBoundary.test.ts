@@ -23,7 +23,7 @@ const booking: Booking = {
   notes: '',
   status: 'confirmed',
 };
-describe('security trust boundaries', () => {
+describe('ขอบเขตความเชื่อถือของข้อมูล', () => {
   it.each([
     null,
     {},
@@ -33,7 +33,7 @@ describe('security trust boundaries', () => {
     { ...booking, purpose: 'x'.repeat(201) },
     { ...booking, notes: 'x'.repeat(1001) },
     { ...booking, name: 'bad\u0000text' },
-  ])('SR-01 rejects malformed or unbounded input %#', (value) => {
+  ])('SR-01 ปฏิเสธข้อมูลผิดรูปหรือเกินขอบเขต %#', (value) => {
     expect(new BookingRulesValidator().validate(value as BookingInput, [])).not.toBe('');
   });
   it.each([
@@ -43,7 +43,7 @@ describe('security trust boundaries', () => {
     { ...booking, attendees: 101 },
     { ...booking, status: 'admin' },
     { ...booking, start: 539 },
-  ])('SR-02 rejects tampered stored records %#', (value) => {
+  ])('SR-02 ปฏิเสธข้อมูลจัดเก็บที่ถูกดัดแปลงผิดรูป %#', (value) => {
     const storage = new MemoryStorageAdapter();
     const raw = JSON.stringify({ version: 0, state: { bookings: [value] } });
     storage.setItem(BOOKING_STORAGE_KEY, raw);
@@ -51,10 +51,10 @@ describe('security trust boundaries', () => {
     expect(storage.getItem(BOOKING_STORAGE_KEY)).toBe(raw);
   });
   for (const [name, create] of [
-    ['memory', () => new MemoryBookingRepository()],
+    ['หน่วยความจำ', () => new MemoryBookingRepository()],
     ['local', () => new LocalStorageBookingRepository(new MemoryStorageAdapter())],
   ] as const) {
-    it(`SR-02 ${name} rejects duplicate IDs and excessive records`, () => {
+    it(`SR-02 ${name} ปฏิเสธ ID ซ้ำและจำนวนรายการเกินขอบเขต`, () => {
       const repo = create();
       expect(() => repo.replaceAll([booking, booking])).toThrow();
       expect(() =>
@@ -63,14 +63,14 @@ describe('security trust boundaries', () => {
       expect(repo.getAll()).toEqual([]);
     });
   }
-  it('SR-02 rejects oversized JSON before parsing without replacing it', () => {
+  it('SR-02 ปฏิเสธ JSON ใหญ่เกินก่อนอ่านโดยไม่เขียนทับ', () => {
     const storage = new MemoryStorageAdapter();
     const raw = ' '.repeat(2 * 1024 * 1024 + 1);
     storage.setItem(BOOKING_STORAGE_KEY, raw);
-    expect(() => new LocalStorageBookingRepository(storage).getAll()).toThrow('limit');
+    expect(() => new LocalStorageBookingRepository(storage).getAll()).toThrow('ขนาด');
     expect(storage.getItem(BOOKING_STORAGE_KEY)).toBe(raw);
   });
-  it('SR-04 cannot inject an additional calendar event or unsafe filename', () => {
+  it('SR-04 ไม่เปิดให้แทรกเหตุการณ์เพิ่มหรือชื่อไฟล์อันตราย', () => {
     const file = new IcsCalendarExporter().export({
       ...booking,
       id: '../escape',
@@ -80,7 +80,7 @@ describe('security trust boundaries', () => {
     expect(file.content.match(/\r\nBEGIN:VEVENT\r\n/g)).toHaveLength(1);
     expect(file.content).toContain('Meeting\\nBEGIN:VEVENT\\nSUMMARY:Injected');
   });
-  it('SR-04 folds Thai calendar content at UTF-8 byte boundaries', () => {
+  it('SR-04 ตัดบรรทัดปฏิทินภาษาไทยตามขอบเขตไบต์ UTF-8', () => {
     const file = new IcsCalendarExporter().export({ ...booking, purpose: 'ประชุม'.repeat(30) });
     for (const line of file.content.split('\r\n'))
       expect(new TextEncoder().encode(line).length).toBeLessThanOrEqual(75);

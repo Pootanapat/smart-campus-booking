@@ -1,6 +1,6 @@
 import type { Booking, BookingInput, Clock } from '../types/booking';
 
-/** Synchronous prototype contract: reads are snapshots; failed writes throw. */
+/** สัญญาต้นแบบแบบ synchronous: อ่านเป็นสำเนา และโยนข้อผิดพลาดเมื่อเขียนไม่สำเร็จ */
 export interface BookingRepository {
   getAll(): Booking[];
   replaceAll(bookings: readonly Booking[]): void;

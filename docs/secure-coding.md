@@ -1,36 +1,36 @@
-# Secure Coding และ Refactoring Evidence
+# การเขียนโค้ดอย่างปลอดภัยและหลักฐานการปรับโครงสร้าง
 
 ## จุดที่ปรับจริงและหลักการ
 
-| จุด                               | เหตุผล / หลักการ                                                                          | Implementation                                                         | หลักฐานทดสอบ                                                        |
-| --------------------------------- | ----------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| Runtime boundary                  | TypeScript types ถูกลบตอน runtime จึงต้องตรวจข้อมูลจริง ไม่พึ่ง form attributes           | `src/security/bookingBoundary.ts`, rule แรกใน `domain/bookingRules.ts` | `bookingBoundary.test.ts`: SR-01 malformed/unbounded input          |
-| Persisted data is untrusted       | localStorage แก้ได้ ต้อง allowlist room/status, date/time, IDs และตรวจขนาดก่อน JSON.parse | `repositories/bookingRepository.ts` + boundary assertions              | SR-02 tampered records / duplicate IDs / oversized JSON             |
-| Output encoding / safe rendering  | ข้อมูลหัวข้อเป็นข้อความ ไม่ใส่ `dangerouslySetInnerHTML` หรือ `innerHTML`                 | `components/BookingsView.tsx`, `BookingDialog.tsx`, `TimelineView.tsx` | `tests/booking.spec.ts`: SR-03 hostile text ไม่สร้าง element/script |
-| Export injection defense          | ป้องกัน CRLF สร้าง property/event ใหม่ และชื่อไฟล์มี path separators                      | `services/icsCalendarExporter.ts`                                      | SR-04 event injection / filename / UTF-8 folding tests              |
-| Business policy enforcement       | ห้ามใช้ disabled button เป็นจุดตรวจเดียว; revalidate ตอน save/cancel                      | `BookingService.save/cancel`, `BookingRulesValidator`, `canCancel`     | overlap, self-edit vs other ID, >24h/exact cutoff tests             |
-| Fail safely / data integrity      | write ไม่สำเร็จต้องไม่แจ้งจองสำเร็จ; JSON เสียต้องไม่ถูกทับเงียบ ๆ                        | `BookingService.update`, `state/createBookingStore.ts`                 | repository tests: corrupted data / quota failure                    |
-| Defense in depth                  | static server ให้ CSP, nosniff, frame denial และปฏิเสธ dot/private paths                  | `deployment/static-server.mjs`                                         | `npm run test:deployment`, local smoke JSON                         |
-| Least privilege / reproducibility | pinned action SHAs, `npm ci`, audit, read-only CI, deploy เฉพาะ main หลังผ่าน tests       | `.github/workflows/ci-cd.yml`, lockfile                                | workflow execution ต้องอ้าง run URL จริงหลัง Push                   |
+| จุดปรับ                        | เหตุผลและหลักการ                                                                     | โค้ด                                                               | หลักฐานทดสอบ                                             |
+| ------------------------------ | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------ | -------------------------------------------------------- |
+| ตรวจข้อมูลจริงที่ขอบเขตรับเข้า | ชนิด TypeScript ไม่อยู่ตอนทำงาน จึงต้องตรวจข้อมูลจริง ไม่พึ่งคุณสมบัติแบบฟอร์ม       | `security/bookingBoundary.ts`, กฎแรกใน `domain/bookingRules.ts`    | `bookingBoundary.test.ts`: SR-01 ข้อมูลผิดรูป/เกินขอบเขต |
+| ไม่เชื่อถือข้อมูลจัดเก็บ       | localStorage แก้ได้ ต้องตรวจห้อง สถานะ วันเวลา ID และขนาดก่อน `JSON.parse`           | `repositories/bookingRepository.ts` และฟังก์ชันตรวจขอบเขต          | SR-02 ข้อมูลดัดแปลง ID ซ้ำ และ JSON ใหญ่เกิน             |
+| แสดงข้อความอย่างปลอดภัย        | หัวข้อเป็นข้อความ ไม่ใช้ `dangerouslySetInnerHTML` หรือ `innerHTML`                  | `BookingsView`, `BookingDialog`, `TimelineView`                    | ชุดทดสอบเบราว์เซอร์ SR-03 ไม่สร้าง HTML ที่ทำงานได้      |
+| ป้องกันแทรกข้อมูลส่งออก        | ป้องกัน CRLF สร้างเขตข้อมูล/เหตุการณ์ใหม่ และปฏิเสธตัวแบ่งเส้นทางในชื่อไฟล์          | `services/icsCalendarExporter.ts`                                  | SR-04 การแทรกเหตุการณ์ ชื่อไฟล์ และการตัดบรรทัด UTF-8    |
+| บังคับนโยบายธุรกิจในบริการ     | ไม่พึ่งปุ่มปิดการใช้งานเพียงจุดเดียว และตรวจซ้ำตอนบันทึก/ยกเลิก                      | `BookingService.save/cancel`, `BookingRulesValidator`, `canCancel` | เวลาทับซ้อน แก้ตัวเอง/ชนรายการอื่น และจุดตัด 24 ชั่วโมง  |
+| รักษาข้อมูลเมื่อล้มเหลว        | เขียนไม่สำเร็จต้องไม่แจ้งว่าจองสำเร็จ และไม่เขียนทับ JSON เสีย                       | `BookingService.update`, `state/createBookingStore.ts`             | ทดสอบข้อมูลเสียและพื้นที่จัดเก็บไม่พอ                    |
+| ป้องกันหลายชั้น                | เซิร์ฟเวอร์ในเครื่องส่ง CSP, nosniff, การปฏิเสธฝังหน้า และปฏิเสธเส้นทางส่วนตัว       | `deployment/static-server.mjs`                                     | `npm run test:deployment` และ JSON ผลตรวจในเครื่อง       |
+| จำกัดสิทธิ์และสร้างซ้ำได้      | ตรึง Actions ด้วย SHA ใช้ `npm ci` ตรวจช่องโหว่ และติดตั้งเฉพาะ main หลังผ่านการตรวจ | `.github/workflows/ci-cd.yml`, lockfile                            | อ้างรอบ GitHub Actions และชุดไฟล์หลักฐานจริง             |
 
-## ขอบเขต input ที่บังคับจริง
+## ขอบเขตข้อมูลรับเข้าที่บังคับจริง
 
-- ข้อความหลักไม่เกิน 200 ตัวอักษร; notes ไม่เกิน 1000; phone ไม่เกิน 20; ปฏิเสธ control characters ที่ไม่ใช่ whitespace ที่อนุญาต
-- ต้องเป็นชนิดข้อมูลถูกต้องและตัวเลข finite; กฎถัดไปตรวจ integer, ช่วงเวลา 07:00–17:00, half-hour, capacity, date/contact
-- persisted bookings ไม่เกิน 1000 รายการและ JSON ไม่เกิน 2 MiB (UTF-8 bytes); ตรวจ duplicate IDs, enum, date ที่มีจริง และ room ที่มีใน catalog
-- ไม่ reject ข้อความเพียงเพราะมี `<` หรือ `>`: ข้อความอิสระแสดงผ่าน React text rendering; input validation กับ output encoding เป็นคนละหน้าที่
-- มี schema validation ทั้ง MemoryBookingRepository และ LocalStorageBookingRepository เพื่อคง LSP ตาม contract เดียวกัน
+- ข้อความหลักไม่เกิน 200 ตัวอักษร, `notes` ไม่เกิน 1000 และ `phone` ไม่เกิน 20 ปฏิเสธอักขระควบคุมที่ไม่ใช่ช่องว่างชนิดที่อนุญาต
+- ชนิดข้อมูลต้องถูกต้องและตัวเลขต้องเป็นจำนวนจำกัด กฎถัดไปตรวจจำนวนเต็ม ช่วง 07:00–17:00 ครึ่งชั่วโมง ความจุ วันที่ และข้อมูลติดต่อ
+- รายการจัดเก็บไม่เกิน 1000 รายการและ JSON ไม่เกิน 2 MiB แบบ UTF-8 ตรวจ ID ซ้ำ ค่าที่อนุญาต วันที่จริง และห้องในรายการ
+- ไม่ปฏิเสธข้อความเพียงเพราะมี `<` หรือ `>` ข้อความอิสระแสดงผ่าน React การตรวจข้อมูลกับการเข้ารหัสข้อความเมื่อแสดงผลเป็นคนละหน้าที่
+- ทั้ง `MemoryBookingRepository` และ `LocalStorageBookingRepository` ตรวจรูปแบบเดียวกันเพื่อรักษา LSP
 
-## ตัวอย่างโค้ด 1: ตรวจที่ trust boundary
+## ตัวอย่างโค้ด 1: ตรวจที่ขอบเขตความเชื่อถือ
 
 ```typescript
-// src/domain/bookingRules.ts — เป็นกฎแรกใน pipeline
+// src/domain/bookingRules.ts — เป็นกฎแรกในลำดับตรวจสอบ
 (input) => (isBookingInput(input) ? '' : 'ข้อมูลการจองไม่ถูกต้องหรือยาวเกินกำหนด');
 ```
 
-`isBookingInput` รับ `unknown` และตรวจ runtime type/length/control characters ก่อนกฎอื่นเรียก `.trim()` หรือใช้ field มี security test ส่ง null/object ที่ชนิดผิดเข้ามาตรง ๆ จึงไม่อาศัยเฉพาะ React form
+`isBookingInput` รับ `unknown` ตรวจชนิด ความยาว และอักขระควบคุม ก่อนกฎอื่นเรียก `.trim()` หรือใช้เขตข้อมูล มีการทดสอบส่ง null/object ที่ชนิดผิดโดยตรง จึงไม่อาศัยเฉพาะแบบฟอร์ม React
 
-## ตัวอย่างโค้ด 2: แยกความรับผิดชอบและบังคับ cutoff ใน service
+## ตัวอย่างโค้ด 2: แยกหน้าที่และบังคับเวลายกเลิกในบริการ
 
 ```typescript
 // src/services/bookingService.ts
@@ -40,22 +40,22 @@ if (!canCancel(booking, this.clock.now()))
   return { error: 'ยกเลิกได้ก่อนเริ่มประชุมมากกว่า 24 ชั่วโมงเท่านั้น' };
 ```
 
-UI มีหน้าที่สื่อสารกับผู้ใช้ ส่วน service บังคับ business policy ก่อน repository เขียนข้อมูล การเปลี่ยน clock/repository ใน tests ทำได้โดยไม่แก้ UI แสดง SRP/DIP และ High Cohesion/Low Coupling
+หน้าจอสื่อสารกับผู้ใช้ ส่วนบริการบังคับนโยบายก่อนจัดเก็บ การเปลี่ยน clock/repository ในชุดทดสอบไม่ต้องแก้หน้าจอ แสดง SRP/DIP ความเป็นเอกภาพของหน้าที่และการพึ่งพากันต่ำ
 
-## Refactoring ที่ทำแล้ว
+## การปรับโครงสร้างที่ทำแล้ว
 
-1. `main.tsx` เหลือ framework bootstrapping; presentation ย้ายเป็น component ที่มีหน้าที่ชัดเจน
-2. validation และ selectors แยกจาก JSX; `BookingRulesValidator` เพิ่ม policy ผ่าน function list ได้ (OCP)
-3. Zustand เป็น in-memory state adapter; persistence อยู่ใน repository ที่รับ `StorageAdapter`
-4. ใช้ constructor injection สำหรับ service/repository/validator/clock และมี contract tests ของสอง repository (LSP/ISP/DIP)
-5. serialization ICS แยกจาก DOM download จึงทดสอบ injection/UTF-8 โดยไม่ต้องเปิด browser
-6. เพิ่ม `security/` สำหรับ shared runtime boundary ที่ domain rules และ repository ใช้ร่วมกัน
+1. `main.tsx` เหลือการเริ่มต้นเฟรมเวิร์ก แยกหน้าจอเป็นส่วนประกอบที่มีหน้าที่ชัดเจน
+2. กฎตรวจข้อมูลและตัวคัดเลือกแยกจาก JSX เพิ่มนโยบายใน `BookingRulesValidator` ผ่านรายการฟังก์ชันได้ตาม OCP
+3. Zustand เก็บสถานะในหน่วยความจำ ส่วนการจัดเก็บถาวรอยู่ใน repository ที่รับ `StorageAdapter`
+4. ส่ง dependency ผ่าน constructor ให้บริการ/repository/validator/clock และทดสอบสัญญาของ repository สองแบบเพื่อยืนยัน LSP/ISP/DIP
+5. สร้างข้อมูล ICS แยกจาก DOM download จึงทดสอบการแทรกข้อความและ UTF-8 โดยไม่ต้องเปิดเบราว์เซอร์
+6. `security/` รวมการตรวจขอบเขตข้อมูลจริงที่กฎโดเมนและ repository ใช้ร่วมกัน
 
-## สิ่งที่ห้ามสรุปเกินหลักฐาน
+## ข้อจำกัดที่ต้องอธิบายตามจริง
 
-- Client-side checks ไม่ใช่ authorization: เจ้าของ browser สามารถแก้ valid JSON หรือ JavaScript ได้
-- ไม่มี password/token จริง; ไม่มีการอ้าง encryption at rest, trusted audit, server sessions หรือ CSRF middleware ที่ไม่ได้มีอยู่
-- local response headers ทดสอบกับ Node static server; GitHub Pages ไม่ส่ง headers ชุดนี้ตามไฟล์ Node โดยอัตโนมัติ
-- audit ที่ผ่านหมายถึงไม่พบ advisory ตาม registry/ระดับที่ใช้ ณ เวลารัน ไม่ใช่รับรองว่า dependency ไม่มีช่องโหว่ทั้งหมด
+- การตรวจฝั่งเบราว์เซอร์ไม่ใช่การตรวจสิทธิ์ที่เชื่อถือได้ เจ้าของเบราว์เซอร์ยังแก้ JSON หรือ JavaScript ที่ถูกต้องตามรูปแบบได้
+- ไม่มีรหัสผ่านหรือ token จริง ไม่ได้อ้างการเข้ารหัสขณะจัดเก็บ บันทึกตรวจสอบที่เชื่อถือได้ session ที่เซิร์ฟเวอร์ หรือ CSRF middleware ที่ยังไม่มี
+- ตรวจ response headers กับ Node static server ในเครื่อง GitHub Pages ไม่ใช้ headers ชุดเดียวกันโดยอัตโนมัติ
+- ผลตรวจ dependency ที่ผ่านหมายถึงไม่พบประกาศช่องโหว่ตามระดับและเวลาที่ตรวจ ไม่ใช่การรับรองว่าไม่มีช่องโหว่ทั้งหมด
 
-หลักการอ้างอิง: [OWASP Input Validation](https://cheatsheetseries.owasp.org/cheatsheets/Input_Validation_Cheat_Sheet.html), [OWASP XSS Prevention](https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html), [OWASP HTML5 Security](https://cheatsheetseries.owasp.org/cheatsheets/HTML5_Security_Cheat_Sheet.html)
+หลักการอ้างอิง: [การตรวจข้อมูลรับเข้าของ OWASP](https://cheatsheetseries.owasp.org/cheatsheets/Input_Validation_Cheat_Sheet.html), [การป้องกัน XSS ของ OWASP](https://cheatsheetseries.owasp.org/cheatsheets/Cross_Site_Scripting_Prevention_Cheat_Sheet.html), [ความปลอดภัย HTML5 ของ OWASP](https://cheatsheetseries.owasp.org/cheatsheets/HTML5_Security_Cheat_Sheet.html)

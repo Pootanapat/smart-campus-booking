@@ -7,7 +7,7 @@ import { IcsCalendarExporter } from './services/icsCalendarExporter';
 import { PreferencesService } from './services/preferencesService';
 import { createBookingStore } from './state/createBookingStore';
 import { systemClock } from './utils/dateTime';
-/** Composition root: the only place wiring production concrete dependencies. */
+/** จุดประกอบ dependency: รวมการสร้างและเชื่อมคลาสที่ใช้งานจริงไว้ที่เดียว */
 const storage = new BrowserStorageAdapter();
 const repository = new LocalStorageBookingRepository(storage);
 const validator = new BookingRulesValidator();

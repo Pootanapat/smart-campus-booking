@@ -26,7 +26,7 @@ export function Sidebar({
           K<span>•</span>
         </span>
         <span>
-          KMITL<b>ROOM BOOKING</b>
+          KMITL<b>ระบบจองห้องประชุม</b>
         </span>
       </NavLink>
       <div className="workspace">
@@ -38,7 +38,7 @@ export function Sidebar({
         </div>
         <span className="workspace-dot" />
       </div>
-      <p className="nav-label">WORKSPACE</p>
+      <p className="nav-label">พื้นที่ทำงาน</p>
       <nav>
         <NavLink to="/" end>
           <LayoutDashboard size={19} />
@@ -75,9 +75,9 @@ export function Sidebar({
           <div>
             <strong>ผู้ใช้งาน KMITL</strong>
             <select aria-label="บทบาทจำลอง" value={role} onChange={(e) => setRole(e.target.value)}>
-              <option value="student">นักศึกษา · Student</option>
-              <option value="staff">บุคลากร · Staff</option>
-              <option value="admin">ผู้ดูแล · Admin</option>
+              <option value="student">นักศึกษา</option>
+              <option value="staff">บุคลากร</option>
+              <option value="admin">ผู้ดูแลระบบ</option>
             </select>
           </div>
           <span className="online" />

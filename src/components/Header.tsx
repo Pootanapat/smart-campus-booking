@@ -25,7 +25,7 @@ export function Header({
       <div>
         <span className="campus">
           <span />
-          ลาดกระบังแคมปัส
+          วิทยาเขตลาดกระบัง
         </span>
         <button className="icon-button" aria-label="เปลี่ยนธีม" onClick={onToggleTheme}>
           {dark ? <Sun size={18} /> : <Moon size={18} />}

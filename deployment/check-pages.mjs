@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { mkdir, writeFile } from 'node:fs/promises';
 const base = new URL(process.env.DEPLOYMENT_URL);
 assert.equal(base.protocol, 'https:');
-assert.ok(base.hostname.endsWith('.github.io'), 'Expected a GitHub Pages URL');
+assert.ok(base.hostname.endsWith('.github.io'), 'ต้องใช้ URL ของ GitHub Pages');
 const response = await fetch(base, { signal: AbortSignal.timeout(30000) });
 assert.equal(response.status, 200);
 const html = await response.text();

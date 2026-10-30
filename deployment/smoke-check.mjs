@@ -37,4 +37,4 @@ const evidence = {
   passed: true,
 };
 await writeFile('docs/evidence/local-deployment.json', JSON.stringify(evidence, null, 2) + '\n');
-console.log(`Deployment smoke checks passed: ${results.length}`);
+console.log(`การตรวจเบื้องต้นหลังติดตั้งผ่าน: ${results.length}`);

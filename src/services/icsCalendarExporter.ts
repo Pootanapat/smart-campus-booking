@@ -7,7 +7,7 @@ const escapeText = (value: string) =>
     .replace(/\r\n|\r|\n/g, '\\n')
     .replace(/,/g, '\\,')
     .replace(/;/g, '\\;');
-// RFC 5545: continuation lines start with one space; never split a UTF-8 character.
+// RFC 5545: บรรทัดต่อเริ่มด้วยช่องว่างหนึ่งตัว และไม่ตัดกลางอักขระ UTF-8
 const foldLine = (line: string): string => {
   const encoder = new TextEncoder();
   let width = 0;
@@ -28,7 +28,7 @@ const utcStamp = (date: Date) =>
     .toISOString()
     .replace(/[-:]/g, '')
     .replace(/\.\d{3}/, '');
-/** Serializes calendar data only; it never initiates a browser download. */
+/** สร้างเฉพาะข้อมูลไฟล์ปฏิทิน โดยไม่สั่งดาวน์โหลดผ่านเบราว์เซอร์ */
 export class IcsCalendarExporter implements CalendarExporter {
   constructor(private readonly clock: Clock = systemClock) {}
   export(booking: Booking): ReturnType<CalendarExporter['export']> {
@@ -42,7 +42,7 @@ export class IcsCalendarExporter implements CalendarExporter {
       `DTSTART:${utcStamp(new Date(bookingTimestamp(booking.date, booking.start)))}`,
       `DTEND:${utcStamp(new Date(bookingTimestamp(booking.date, booking.end)))}`,
       `SUMMARY:${escapeText(booking.purpose)}`,
-      `LOCATION:KMITL Room ${escapeText(booking.roomId)}`,
+      `LOCATION:ห้องประชุม ${escapeText(booking.roomId)} KMITL`,
       `DESCRIPTION:${escapeText(booking.notes)}`,
       'END:VEVENT',
       'END:VCALENDAR',

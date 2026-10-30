@@ -22,7 +22,7 @@ const mime = {
 };
 export function createStaticServer(directory, basePath = '/') {
   if (!basePath.startsWith('/') || !basePath.endsWith('/') || basePath.split('/').includes('..'))
-    throw new Error('Invalid mount path');
+    throw new Error('เส้นทางให้บริการไม่ถูกต้อง');
   const root = resolve(directory);
   return createServer(async (req, res) => {
     for (const [name, value] of Object.entries(securityHeaders)) res.setHeader(name, value);
@@ -37,7 +37,7 @@ export function createStaticServer(directory, basePath = '/') {
       if (basePath !== '/') {
         if (!pathname.startsWith(basePath)) {
           res.writeHead(404);
-          res.end('Not found');
+          res.end('ไม่พบข้อมูล');
           return;
         }
         pathname = pathname.slice(basePath.length - 1);
@@ -49,13 +49,13 @@ export function createStaticServer(directory, basePath = '/') {
         parts.some((p) => p === '..' || p.startsWith('.'))
       ) {
         res.writeHead(403);
-        res.end('Forbidden');
+        res.end('ไม่อนุญาตให้เข้าถึง');
         return;
       }
       let file = resolve(root, `.${pathname}`);
       if (file !== root && !file.startsWith(root + sep)) {
         res.writeHead(403);
-        res.end('Forbidden');
+        res.end('ไม่อนุญาตให้เข้าถึง');
         return;
       }
       try {
@@ -63,7 +63,7 @@ export function createStaticServer(directory, basePath = '/') {
       } catch {
         if (extname(file)) {
           res.writeHead(404);
-          res.end('Not found');
+          res.end('ไม่พบข้อมูล');
           return;
         }
         file = resolve(root, 'index.html');
@@ -72,7 +72,7 @@ export function createStaticServer(directory, basePath = '/') {
       const actualRoot = await realpath(root);
       if (!actual.startsWith(actualRoot + sep)) {
         res.writeHead(403);
-        res.end('Forbidden');
+        res.end('ไม่อนุญาตให้เข้าถึง');
         return;
       }
       const content = await readFile(actual);
@@ -81,7 +81,7 @@ export function createStaticServer(directory, basePath = '/') {
       res.end(req.method === 'HEAD' ? undefined : content);
     } catch (error) {
       res.writeHead(error instanceof URIError ? 400 : 404);
-      res.end('Not found');
+      res.end('ไม่พบข้อมูล');
     }
   });
 }
@@ -89,8 +89,9 @@ if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1]
   const arg = (name) => process.argv[process.argv.indexOf(name) + 1];
   const root = process.argv.includes('--root') ? arg('--root') : '.deployment/current';
   const port = Number(process.argv.includes('--port') ? arg('--port') : 5190);
-  if (!Number.isInteger(port) || port < 1 || port > 65535) throw new Error('Invalid port');
+  if (!Number.isInteger(port) || port < 1 || port > 65535)
+    throw new Error('หมายเลขพอร์ตไม่ถูกต้อง');
   createStaticServer(root).listen(port, '127.0.0.1', () =>
-    console.log(`Static deployment: http://127.0.0.1:${port} (root: ${root})`),
+    console.log(`เว็บไซต์ที่ติดตั้ง: http://127.0.0.1:${port} (โฟลเดอร์: ${root})`),
   );
 }

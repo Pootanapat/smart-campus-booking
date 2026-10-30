@@ -70,7 +70,7 @@ export const defaultBookingRules: readonly BookingRule[] = [
       ? 'ช่วงเวลานี้มีการจองแล้ว กรุณาเลือกเวลาอื่น'
       : '',
 ];
-/** New policy functions can be injected without changing the validation algorithm. */
+/** ส่งฟังก์ชันนโยบายใหม่เพิ่มได้โดยไม่แก้อัลกอริทึมตรวจสอบเดิม */
 export class BookingRulesValidator implements BookingValidator {
   constructor(
     private readonly rules: readonly BookingRule[] = defaultBookingRules,

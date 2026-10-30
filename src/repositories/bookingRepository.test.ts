@@ -36,13 +36,13 @@ const createService = (repository: BookingRepository) => {
     () => (++sequence === 1 ? 'generated' : `generated-${sequence}`),
   );
 };
-// Shared behavioral contract proves that both implementations can replace the abstraction.
+// ใช้สัญญาพฤติกรรมร่วมกันเพื่อยืนยันว่าทั้งสองแบบใช้แทนสัญญานามธรรมได้
 for (const [name, create] of [
-  ['memory', () => new MemoryBookingRepository()],
-  ['local-storage repository', () => new LocalStorageBookingRepository(new MemoryStorageAdapter())],
+  ['หน่วยความจำ', () => new MemoryBookingRepository()],
+  ['localStorage', () => new LocalStorageBookingRepository(new MemoryStorageAdapter())],
 ] as const) {
-  describe(`${name} repository contract`, () => {
-    it('starts empty, replaces snapshots, and returns detached data', () => {
+  describe(`สัญญา repository แบบ ${name}`, () => {
+    it('เริ่มว่าง แทนที่สำเนา และคืนข้อมูลที่แยกจากต้นฉบับ', () => {
       const repo = create();
       expect(repo.getAll()).toEqual([]);
       repo.replaceAll([booking]);
@@ -53,7 +53,7 @@ for (const [name, create] of [
       repo.replaceAll([]);
       expect(repo.getAll()).toEqual([]);
     });
-    it('works with the same booking use cases', () => {
+    it('ใช้งานกับกรณีจองชุดเดียวกันได้', () => {
       const service = createService(create());
       expect(service.save(booking).error).toBe('');
       expect(service.list()[0].id).toBe('generated');
@@ -67,11 +67,11 @@ for (const [name, create] of [
     });
   });
 }
-describe('storage adapter contract', () => {
+describe('สัญญาตัวเชื่อมต่อพื้นที่จัดเก็บ', () => {
   for (const [name, create] of [
-    ['memory', () => new MemoryStorageAdapter()],
+    ['หน่วยความจำ', () => new MemoryStorageAdapter()],
     [
-      'browser wrapper',
+      'ตัวเชื่อมต่อเบราว์เซอร์',
       () => {
         const data = new Map<string, string>();
         return new BrowserStorageAdapter(() => ({
@@ -83,7 +83,7 @@ describe('storage adapter contract', () => {
       },
     ],
   ] as const) {
-    it(`${name} returns null and overwrites values`, () => {
+    it(`${name} คืน null เมื่อไม่มีค่าและเขียนทับค่าได้`, () => {
       const storage = create();
       expect(storage.getItem('missing')).toBeNull();
       storage.setItem('k', 'one');
@@ -92,8 +92,8 @@ describe('storage adapter contract', () => {
     });
   }
 });
-describe('local persistence and safe failure behavior', () => {
-  it('reloads bookings across repository/store instances and keeps legacy role', () => {
+describe('การจัดเก็บในเครื่องและพฤติกรรมเมื่อล้มเหลว', () => {
+  it('โหลดรายการข้ามวัตถุ repository และสถานะพร้อมรักษาบทบาทเดิม', () => {
     const storage = new MemoryStorageAdapter();
     storage.setItem(
       BOOKING_STORAGE_KEY,
@@ -114,7 +114,7 @@ describe('local persistence and safe failure behavior', () => {
     expect(reloaded.getState().role).toBe('admin');
     expect(JSON.parse(storage.getItem(BOOKING_STORAGE_KEY)!).state.role).toBe('staff');
   });
-  it('preserves malformed data and surfaces an error instead of overwriting it', () => {
+  it('รักษาข้อมูลผิดรูปและแจ้งข้อผิดพลาดโดยไม่เขียนทับ', () => {
     const storage = new MemoryStorageAdapter();
     storage.setItem(BOOKING_STORAGE_KEY, 'broken JSON');
     const store = createBookingStore(
@@ -125,7 +125,7 @@ describe('local persistence and safe failure behavior', () => {
     expect(store.getState().save(booking)).not.toBe('');
     expect(storage.getItem(BOOKING_STORAGE_KEY)).toBe('broken JSON');
   });
-  it('does not update UI state when persistence fails', () => {
+  it('ไม่ปรับสถานะหน้าจอเมื่อบันทึกไม่สำเร็จ', () => {
     const storage: StorageAdapter = {
       getItem: () => null,
       setItem: () => {
@@ -140,7 +140,7 @@ describe('local persistence and safe failure behavior', () => {
     expect(store.getState().bookings).toEqual([]);
     expect(store.getState().storageError).not.toBe('');
   });
-  it('rejects invalid saved structures and unsupported versions', () => {
+  it('ปฏิเสธโครงข้อมูลผิดและเวอร์ชันที่ไม่รองรับ', () => {
     for (const content of [
       { state: { bookings: [{}] } },
       { state: { bookings: [] }, version: 99 },
@@ -152,7 +152,7 @@ describe('local persistence and safe failure behavior', () => {
       expect(() => new LocalStorageBookingRepository(storage).getAll()).toThrow();
     }
   });
-  it('tolerates unavailable optional preference storage', () => {
+  it('รองรับพื้นที่ค่ากำหนดที่ไม่พร้อมใช้งาน', () => {
     const storage: StorageAdapter = {
       getItem: () => {
         throw new Error('blocked');
@@ -167,19 +167,19 @@ describe('local persistence and safe failure behavior', () => {
     expect(() => prefs.set('theme', 'dark')).not.toThrow();
   });
 });
-describe('booking service policy boundaries', () => {
-  it('rejects cancellation at the cutoff without changing data', () => {
+describe('ขอบเขตนโยบายในบริการจอง', () => {
+  it('ปฏิเสธยกเลิกตรงจุดตัดโดยไม่เปลี่ยนข้อมูล', () => {
     const repo = new MemoryBookingRepository();
     repo.replaceAll([{ ...booking, date: '2030-01-02', start: 420 }]);
     expect(createService(repo).cancel('one').error).toContain('24');
     expect(repo.getAll()[0].status).toBe('confirmed');
   });
-  it('rejects editing or cancelling a missing booking', () => {
+  it('ปฏิเสธแก้ไขหรือยกเลิกรายการที่ไม่มี', () => {
     const service = createService(new MemoryBookingRepository());
     expect(service.save(booking, 'missing').error).not.toBe('');
     expect(service.cancel('missing').error).not.toBe('');
   });
-  it('loads demo bookings once per room/date and clears explicitly', () => {
+  it('โหลดตัวอย่างครั้งเดียวต่อห้องและวัน และล้างเมื่อสั่ง', () => {
     let id = 0;
     const service = new BookingService(
       new MemoryBookingRepository(),

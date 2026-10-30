@@ -15,7 +15,7 @@ const textLimits = {
 } as const;
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && !Array.isArray(value);
-/** Runtime boundary checks also protect calls made outside the React form. */
+/** ตรวจข้อมูลจริงที่ขอบเขตการรับเข้า รวมถึงการเรียกที่ไม่ได้ผ่านแบบฟอร์ม React */
 export function isBookingInput(value: unknown): value is BookingInput {
   if (!isRecord(value)) return false;
   return (
@@ -30,7 +30,7 @@ export function isBookingInput(value: unknown): value is BookingInput {
     )
   );
 }
-/** Historical dates are allowed on disk; future-time policy is evaluated when saving a booking. */
+/** ข้อมูลที่จัดเก็บมีวันที่ในอดีตได้ แต่ตรวจนโยบายเวลาอนาคตเมื่อบันทึกการจอง */
 export function isStoredBooking(value: unknown): value is Booking {
   if (!isBookingInput(value) || !isRecord(value)) return false;
   const b = value as unknown as Booking;
@@ -54,7 +54,6 @@ export function isStoredBooking(value: unknown): value is Booking {
 }
 export function assertBookingCollection(value: unknown): asserts value is Booking[] {
   if (!Array.isArray(value) || value.length > MAX_BOOKINGS || !value.every(isStoredBooking))
-    throw new Error('Invalid saved bookings');
-  if (new Set(value.map((b) => b.id)).size !== value.length)
-    throw new Error('Duplicate booking identifiers');
+    throw new Error('รูปแบบรายการจองที่บันทึกไว้ไม่ถูกต้อง');
+  if (new Set(value.map((b) => b.id)).size !== value.length) throw new Error('พบรหัสรายการจองซ้ำ');
 }

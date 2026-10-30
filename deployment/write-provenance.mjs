@@ -7,5 +7,5 @@ const data = {
   builtAt: new Date().toISOString(),
 };
 if (!data.revision || !data.repository || !data.runId)
-  throw new Error('GitHub build metadata missing');
+  throw new Error('ไม่พบข้อมูลกำกับการสร้างจาก GitHub');
 await writeFile('dist/deployment.json', JSON.stringify(data, null, 2) + '\n');

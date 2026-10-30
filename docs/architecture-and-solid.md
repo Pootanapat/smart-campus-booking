@@ -1,133 +1,133 @@
-# Architecture and SOLID in KMITL Room Booking
+# สถาปัตยกรรมและการประยุกต์ใช้ SOLID ในระบบจองห้องประชุม KMITL
 
-## Technology Stack and Rubric Compatibility
+## เทคโนโลยีและความสอดคล้องกับเกณฑ์ประเมิน
 
-The project is implemented using **React 18 and TypeScript**, with Vite, Zustand, React Router, Tailwind CSS v4, Motion, and Radix Dialog. It remains a browser application; it has not been migrated to Python.
+โครงงานใช้ **React 18 และ TypeScript** ร่วมกับ Vite, Zustand, React Router, Tailwind CSS v4, Motion และ Radix Dialog ยังคงเป็นเว็บแอปในเบราว์เซอร์ ไม่ได้ย้ายไปใช้ Python
 
-SOLID principles are language-independent object-oriented design principles. TypeScript interfaces, classes, modules, and constructor dependency injection demonstrate the same architectural ideas. React function components handle presentation; classes are used where infrastructure contracts and replaceable implementations improve clarity.
+SOLID เป็นหลักการออกแบบเชิงวัตถุที่ไม่จำกัดภาษา ระบบนี้ใช้ interface, class, module และ constructor dependency injection ของ TypeScript เพื่อแสดงหลักการเดียวกัน หน้าจอใช้ function components ตามแนวทาง React ส่วนบริการและตัวเชื่อมต่อใช้คลาสเมื่อช่วยให้หน้าที่กับสัญญาการทำงานชัดเจน
 
-Python-specific conventions such as **PEP 8 are not directly applicable** because the implementation language is TypeScript. This project does **not** claim Python or PEP 8 compliance. It uses TypeScript conventions: PascalCase components/classes/interfaces, camelCase functions and variables, strict typing, focused modules, and consistent Prettier formatting. These are compatible with common ESLint-style conventions; ESLint itself is not configured. The architecture, responsibility separation, coupling, cohesion, and SOLID evaluation criteria are addressed by the implementation and tests. An instructor must decide whether a language-specific assessment condition permits this equivalent demonstration.
+**ไม่ได้อ้างว่าใช้ Python หรือผ่าน PEP 8** เพราะ PEP 8 เป็นแนวทางเฉพาะ Python โค้ดนี้ใช้ PascalCase สำหรับ component/class/interface, camelCase สำหรับฟังก์ชันและตัวแปร เปิด `strict: true` แยกโมดูล และจัดรูปแบบด้วย Prettier การตั้งชื่อสอดคล้องกับธรรมเนียมที่พบร่วมกับ ESLint แต่ยังไม่ได้ติดตั้ง ESLint การเทียบหลักการไม่ใช่การยกเว้นเงื่อนไขภาษา ต้องให้อาจารย์ยอมรับก่อน
 
-| Python concept in the rubric     | TypeScript/React equivalent in this project                                                          |
-| -------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| Python modules/packages          | ES modules and `domain/`, `services/`, `repositories/`, `components/` folders                        |
-| Classes with instance attributes | TypeScript classes with constructor-injected, private readonly dependencies                          |
-| Abstract base class / protocol   | Structural interfaces: `BookingRepository`, `BookingValidator`, `StorageAdapter`, `CalendarExporter` |
-| Type annotations                 | TypeScript interfaces, unions, function types, and `strict: true`                                    |
-| Inheritance / substitutability   | Implementations satisfy shared interface contracts; composition is preferred to inheritance          |
-| Unit tests / pytest              | Vitest unit and service/repository integration tests                                                 |
-| PEP 8 naming and formatting      | TypeScript naming conventions and Prettier; **not PEP 8 compliance**                                 |
-| Dependency injection             | Constructor arguments supplied in `compositionRoot.ts`                                               |
-| UI/view class                    | React function component with typed props and local interaction state                                |
+| แนวคิด Python ในเกณฑ์       | สิ่งที่ใช้ใน TypeScript/React                                                                            |
+| --------------------------- | -------------------------------------------------------------------------------------------------------- |
+| โมดูลและแพ็กเกจ             | ES modules และโฟลเดอร์ `domain/`, `services/`, `repositories/`, `components/`                            |
+| คลาสและข้อมูลประจำวัตถุ     | คลาส TypeScript รับ dependency ผ่าน constructor และใช้ `private readonly`                                |
+| คลาสฐานนามธรรมหรือ protocol | structural interfaces เช่น `BookingRepository`, `BookingValidator`, `StorageAdapter`, `CalendarExporter` |
+| การระบุชนิดข้อมูล           | interface, union, function type และโหมด strict                                                           |
+| การสืบทอดและการใช้แทนกัน    | ตรวจสัญญาพฤติกรรมร่วมกัน และเลือกการประกอบวัตถุแทนการสืบทอดเมื่อเหมาะสม                                  |
+| การทดสอบด้วย pytest         | Vitest สำหรับหน่วยและการทำงานร่วมกันของบริการ/repository                                                 |
+| การตั้งชื่อและรูปแบบ PEP 8  | ธรรมเนียม TypeScript และ Prettier ซึ่ง **ไม่ใช่การผ่าน PEP 8**                                           |
+| การส่ง dependency จากภายนอก | ประกอบ constructor arguments ใน `compositionRoot.ts`                                                     |
+| คลาสหน้าจอ                  | function component ที่มี typed props และสถานะปฏิสัมพันธ์เฉพาะส่วน                                        |
 
-## System architecture overview
+## ภาพรวมสถาปัตยกรรม
 
-The app uses a small layered architecture, with a composition root for production wiring. It starts with an empty repository, reads existing browser data if present, and only loads sample bookings on explicit request.
+ใช้สถาปัตยกรรมแบ่งชั้นขนาดเล็ก และมีจุดประกอบ dependency สำหรับการใช้งานจริง เริ่มต้นด้วยรายการจองว่าง อ่านข้อมูลเดิมถ้ามี และโหลดข้อมูลตัวอย่างเมื่อผู้ใช้สั่งเท่านั้น
 
 ```text
 src/
-  main.tsx                   React root and framework providers
-  App.tsx                    Page composition and UI coordination
-  compositionRoot.ts         Concrete production dependency wiring
-  components/                Focused React UI components
-  types/                     Booking/room models and small contracts
-  domain/                    Booking rules, room data, selectors, factories
-  services/                  Booking use cases, calendar serialization, preferences, download adapter
-  security/                  Shared runtime input and persisted-data boundary checks
-  repositories/              Storage adapters and booking persistence implementations
-  state/                     In-memory Zustand adapter for use-case results
-  utils/                     Date/time formatting and class-name utility
-  domain.ts                  Compatibility exports for original consumers/tests
-  store.ts                   Compatibility export of the composed store
+  main.tsx              เริ่มต้น React และตัวครอบเฟรมเวิร์ก
+  App.tsx               ประกอบหน้าและประสานสถานะหน้าจอ
+  compositionRoot.ts    ประกอบ dependency ที่ใช้งานจริง
+  components/           ส่วนประกอบหน้าจอที่แยกหน้าที่
+  types/                แบบจำลองและสัญญาการทำงาน
+  domain/               กฎจอง ข้อมูลห้อง ตัวคัดเลือก และตัวสร้างข้อมูล
+  services/             กรณีใช้งาน ปฏิทิน การดาวน์โหลด และค่ากำหนด
+  security/             ตรวจขอบเขตข้อมูลจริงขณะทำงาน
+  repositories/         การอ่านเขียนรายการจองและตัวเชื่อมต่อพื้นที่จัดเก็บ
+  state/                ตัวปรับผลบริการเป็นสถานะ Zustand ในหน่วยความจำ
+  utils/                ฟังก์ชันช่วยด้านวันเวลาและชื่อคลาส
+  domain.ts             ทางเข้าที่คงความเข้ากันได้กับโค้ดเดิม
+  store.ts              ทางเข้าสถานะที่คงความเข้ากันได้กับโค้ดเดิม
 ```
 
-### Layers and dependency direction
+### ชั้นการทำงานและทิศทาง dependency
 
-1. **Presentation:** `App` composes page components. Components own interaction state such as draft fields, drag selection, filters, and dialog visibility. They do not write booking data to localStorage.
-2. **Application:** `BookingService` coordinates save, edit, cancel, demo, and clear operations. It reads the latest repository snapshot, applies domain policy, and persists successful results before exposing them to state.
-3. **Domain:** `bookingRules.ts` defines validation, conflict detection, and cancellation policy. `selectors.ts` handles availability/filtering, booking groups, and statistics. No React, Zustand, DOM, or localStorage dependency is present in the domain.
-4. **Infrastructure:** repositories serialize snapshots through `StorageAdapter`. `BrowserStorageAdapter` accesses browser storage. `BrowserFileDownloader` owns DOM/Blob/object URL download behavior. `IcsCalendarExporter` only generates calendar file data.
-5. **Composition:** `compositionRoot.ts` constructs concrete dependencies. `createBookingStore` adapts service results to React-facing state; it does not use Zustand persistence middleware.
+1. **ชั้นนำเสนอ:** `App` ประกอบหน้าจอ แต่ละ component ดูแลสถานะปฏิสัมพันธ์ เช่น ข้อมูลร่าง การลาก ตัวกรอง และการเปิดกล่องโต้ตอบ ไม่เขียนรายการจองลง localStorage เอง
+2. **ชั้นกรณีใช้งาน:** `BookingService` ประสานการบันทึก แก้ไข ยกเลิก สร้างตัวอย่าง และล้างข้อมูล อ่านข้อมูลล่าสุด ตรวจนโยบาย แล้วจัดเก็บก่อนส่งผลสำเร็จให้สถานะ
+3. **ชั้นโดเมน:** `bookingRules.ts` ตรวจข้อมูล เวลาทับซ้อน และเงื่อนไขยกเลิก ส่วน `selectors.ts` คัดกรองความว่าง จัดกลุ่ม และคำนวณสถิติ ไม่มี dependency ต่อ React, Zustand, DOM หรือ localStorage
+4. **ชั้นโครงสร้างพื้นฐาน:** repository อ่านเขียนผ่าน `StorageAdapter`; `BrowserStorageAdapter` เข้าถึงพื้นที่จัดเก็บ; `BrowserFileDownloader` ดูแล DOM/Blob/object URL; `IcsCalendarExporter` สร้างเฉพาะข้อมูลไฟล์
+5. **จุดประกอบ:** `compositionRoot.ts` สร้าง dependency แบบใช้งานจริง ส่วน `createBookingStore` ปรับผลบริการให้หน้าจอโดยไม่ใช้ middleware จัดเก็บถาวรของ Zustand
 
-Services use interfaces from `types/contracts.ts`. Concrete adapters depend inward on these contracts. The composition root is intentionally allowed to import concrete implementations. The React coordinator imports composed dependencies, while the business service does not know how they were constructed.
+บริการขึ้นกับสัญญาใน `types/contracts.ts` ตัวเชื่อมต่อแบบใช้งานจริงขึ้นกับสัญญาเดียวกัน จุดประกอบสามารถนำเข้าคลาสจริงได้โดยตั้งใจ แต่บริการธุรกิจไม่จำเป็นต้องรู้ว่าถูกสร้างจากที่ใด
 
-## Component responsibilities
+## หน้าที่ของส่วนประกอบหน้าจอ
 
-| Component/module                  | Responsibility                                                                                                             |
-| --------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
-| `main.tsx`                        | Mount React, error boundary, router, and reduced-motion configuration                                                      |
-| `App`                             | Compose the current page, connect store actions, coordinate dialogs, preferences, and notifications                        |
-| `Sidebar`, `Header`               | Workspace navigation, mock role selection, theme/help controls                                                             |
-| `RoomOverview`, `Stat`            | Room summary, hero, and reusable metric display                                                                            |
-| `TimelineView`                    | Search/filter interactions, half-hour timeline, drag/keyboard selection; delegates filtering/conflicts to domain functions |
-| `BookingsView`                    | Booking groups/cards and callbacks for edit, duplicate, cancel, share, and export                                          |
-| `InsightsView`                    | Render domain-computed booking statistics and peak usage chart                                                             |
-| `BookingDialog`                   | Draft form, summary, and error presentation; calls injected validation/save callbacks                                      |
-| `Modal`                           | Radix dialog accessibility, focus management, and Motion transitions                                                       |
-| `SuccessDialog`, `TutorialDialog` | Booking confirmation and first-use guidance                                                                                |
-| `ErrorBoundary`                   | Rendering failure fallback and reload action                                                                               |
-| `createBookingStore`              | Adapt successful use-case results to in-memory UI state and expose action errors                                           |
+| ส่วนประกอบ/โมดูล                  | หน้าที่                                                                       |
+| --------------------------------- | ----------------------------------------------------------------------------- |
+| `main.tsx`                        | เริ่ม React, error boundary, router และการเคารพการตั้งค่าลดภาพเคลื่อนไหว      |
+| `App`                             | ประกอบหน้าปัจจุบัน เชื่อมคำสั่ง ประสานกล่องโต้ตอบ ค่ากำหนด และการแจ้งเตือน    |
+| `Sidebar`, `Header`               | เมนูพื้นที่ทำงาน บทบาทจำลอง การเปลี่ยนธีม และคู่มือ                           |
+| `RoomOverview`, `Stat`            | ภาพรวมพื้นที่ประชุมและตัวชี้วัดที่ใช้ซ้ำได้                                   |
+| `TimelineView`                    | ค้นหา/กรอง ตารางครึ่งชั่วโมง การลากและคีย์บอร์ด โดยเรียกกฎโดเมนสำหรับความว่าง |
+| `BookingsView`                    | กลุ่มและการ์ดการจอง พร้อมคำสั่งแก้ไข ทำสำเนา ยกเลิก แชร์ และส่งออก            |
+| `InsightsView`                    | แสดงสถิติและกราฟจากค่าที่โดเมนคำนวณ                                           |
+| `BookingDialog`                   | แบบฟอร์มร่าง สรุป และข้อผิดพลาด โดยเรียก validation/save callbacks ที่รับมา   |
+| `Modal`                           | การเข้าถึง โฟกัส และการเปลี่ยนผ่านด้วย Radix/Motion                           |
+| `SuccessDialog`, `TutorialDialog` | ยืนยันผลสำเร็จและแนะนำการใช้งานครั้งแรก                                       |
+| `ErrorBoundary`                   | แสดงหน้าสำรองเมื่อแสดงผลล้มเหลวและให้โหลดใหม่                                 |
+| `createBookingStore`              | ปรับผลสำเร็จเป็นสถานะในหน่วยความจำและส่งข้อผิดพลาดให้หน้าจอ                   |
 
-Small UI operations such as changing a filter or opening a dialog remain local. App-level chrome and a generic confirmation dialog remain in `App`; extracting every element would increase indirection without improving the design.
+การเปลี่ยนตัวกรองหรือเปิดกล่องโต้ตอบคงอยู่ใน component ที่เกี่ยวข้อง ส่วนโครงหน้าหลักกับกล่องยืนยันทั่วไปอยู่ใน `App` ไม่แยกทุกองค์ประกอบย่อยเป็นคลาส เพราะจะเพิ่มความซับซ้อนโดยไม่ช่วยหน้าที่ให้ชัดขึ้น
 
-## Class and interface responsibilities
+## หน้าที่ของคลาสและ interface
 
-| Abstraction / class                        | Contract and responsibility                                                                                      |
-| ------------------------------------------ | ---------------------------------------------------------------------------------------------------------------- |
-| `BookingRepository`                        | Read a detached booking snapshot and synchronously replace the snapshot; failures throw                          |
-| `LocalStorageBookingRepository`            | Decode/check the saved envelope and persist bookings through a storage abstraction                               |
-| `MemoryBookingRepository`                  | Equivalent repository behavior using detached in-memory copies for tests                                         |
-| `StorageAdapter`                           | Get a string or null; set a string; storage failures propagate                                                   |
-| `BrowserStorageAdapter`                    | Delegate storage operations to a browser Storage supplier                                                        |
-| `MemoryStorageAdapter`                     | Store string values in a Map; useful for repository tests                                                        |
-| `BookingValidator`                         | Return the first user-facing validation error, or an empty string                                                |
-| `BookingRulesValidator`                    | Evaluate ordered, injectable `BookingRule` functions against an injected clock                                   |
-| `BookingService`                           | Coordinate repository snapshots, rules, IDs, and booking commands                                                |
-| `Clock`                                    | Supply the current date, allowing deterministic policy/export tests                                              |
-| `CalendarExporter`                         | Convert a booking to file metadata and content                                                                   |
-| `IcsCalendarExporter`                      | Escape text and serialize Thailand-local booking times as UTC calendar timestamps                                |
-| `FileDownloader` / `BrowserFileDownloader` | Deliver serialized file data through browser APIs                                                                |
-| `PreferencesService`                       | Persist optional theme/tutorial/role preferences independently of bookings; tolerate disabled preference storage |
+| สัญญา/คลาส                                | หน้าที่และเงื่อนไข                                                                 |
+| ----------------------------------------- | ---------------------------------------------------------------------------------- |
+| `BookingRepository`                       | อ่านสำเนารายการและแทนที่ข้อมูลแบบ synchronous; เมื่อจัดเก็บล้มเหลวให้โยนข้อผิดพลาด |
+| `LocalStorageBookingRepository`           | อ่าน ตรวจรูปแบบข้อมูลเดิม และบันทึกผ่านสัญญาพื้นที่จัดเก็บ                         |
+| `MemoryBookingRepository`                 | ให้พฤติกรรมเดียวกันด้วยสำเนาข้อมูลในหน่วยความจำสำหรับทดสอบ                         |
+| `StorageAdapter`                          | อ่าน string หรือ null และเขียน string โดยส่งต่อข้อผิดพลาด                          |
+| `BrowserStorageAdapter`                   | เรียกพื้นที่จัดเก็บของเบราว์เซอร์ผ่านผู้จัดหาที่รับมา                              |
+| `MemoryStorageAdapter`                    | เก็บ string ใน Map สำหรับทดสอบ repository                                          |
+| `BookingValidator`                        | คืนข้อผิดพลาดแรก หรือ string ว่างเมื่อผ่าน                                         |
+| `BookingRulesValidator`                   | ประเมิน `BookingRule` ตามลำดับด้วย clock ที่รับมา                                  |
+| `BookingService`                          | ประสานสำเนาข้อมูล กฎ ตัวสร้าง ID และคำสั่งจอง                                      |
+| `Clock`                                   | จัดหาวันเวลาปัจจุบันเพื่อให้ทดสอบเงื่อนไขเวลาได้แน่นอน                             |
+| `CalendarExporter`                        | แปลงการจองเป็นเนื้อหาและข้อมูลกำกับไฟล์                                            |
+| `IcsCalendarExporter`                     | เข้ารหัสข้อความ แปลงเวลาไทยเป็น UTC และตัดบรรทัด UTF-8                             |
+| `FileDownloader`, `BrowserFileDownloader` | ส่งข้อมูลไฟล์ออกผ่าน API ของเบราว์เซอร์                                            |
+| `PreferencesService`                      | แยกค่ากำหนดธีม คู่มือ และบทบาทออกจากรายการจอง และทนต่อพื้นที่จัดเก็บที่ถูกปิด      |
 
-## High Cohesion
+## ความเป็นเอกภาพของหน้าที่ (High Cohesion)
 
-Each module groups behavior for one reason to change. Booking policies live together in `bookingRules.ts`; a change in the cancellation cutoff does not require editing a React card. Storage-envelope handling lives in the repository; form presentation lives in `BookingDialog`. Calendar text escaping and timestamps live in the exporter, while DOM download mechanics live in the downloader. Timeline interaction state is owned by the timeline rather than the entry point.
+แต่ละโมดูลรวมพฤติกรรมที่เปลี่ยนด้วยเหตุผลเดียวกัน กฎการจองอยู่ใน `bookingRules.ts` จึงแก้เงื่อนไขยกเลิกได้โดยไม่แก้การ์ดหน้าจอ การจัดรูปแบบข้อมูลจัดเก็บอยู่ใน repository แบบฟอร์มอยู่ใน `BookingDialog` ส่วนการเข้ารหัสปฏิทินกับการดาวน์โหลดอยู่คนละโมดูล สถานะการลากเป็นของตารางเวลาแทนที่จะอยู่ในจุดเริ่มโปรแกรม
 
-## Low Coupling
+## การพึ่งพากันต่ำ (Low Coupling)
 
-`BookingService` receives interfaces rather than constructing browser storage. The store receives a service and preferences instance rather than instantiating infrastructure. UI components receive typed values and callbacks. Repository, validation, and exporter tests run without a browser. Production wiring is explicit in one location, so swapping a synchronous repository does not change the use-case algorithm.
+`BookingService` รับ interface แทนการสร้างพื้นที่จัดเก็บเอง สถานะรับบริการกับค่ากำหนดจากภายนอก หน้าจอรับข้อมูลและ callbacks ที่ระบุชนิด ชุดทดสอบ repository กฎ และปฏิทินจึงทำงานโดยไม่ต้องเปิดเบราว์เซอร์ การเปลี่ยน repository ที่รักษาสัญญา synchronous เดิมไม่ต้องเปลี่ยนอัลกอริทึมของบริการ
 
-Some coupling is intentional: room capacity rules use the fixed domain room catalog; routing/presentation remain React-specific; persistence retains the legacy envelope for compatibility. A future asynchronous server repository requires an explicit asynchronous contract rather than pretending it is a synchronous drop-in replacement.
+บาง dependency จำเป็น เช่น กฎความจุอิงรายการห้องจริง หน้าจอกับ routing ยังคงเป็น React และรูปแบบจัดเก็บต้องรักษาข้อมูลเดิม หากเพิ่ม API แบบ asynchronous ต้องเปลี่ยนสัญญาอย่างชัดเจน ไม่ถือว่าใช้แทน synchronous repository ได้ทันที
 
-## SOLID applied
+## การประยุกต์ใช้ SOLID
 
-### Single Responsibility Principle (SRP)
+### หลักความรับผิดชอบเดียว — Single Responsibility Principle (SRP)
 
-The original entry point mixed layout, forms, filtering, persistence coordination, validation, and export. `main.tsx` now only mounts the application. Components render specific features, rules validate, the repository persists, and the exporter serializes. Responsibility boundaries follow reasons to change, not one class per function.
+เดิมจุดเริ่มโปรแกรมรวมหน้าจอ แบบฟอร์ม ตัวกรอง การประสานจัดเก็บ การตรวจสอบ และการส่งออก ปัจจุบัน `main.tsx` เริ่มต้นแอปเท่านั้น ส่วน component แสดงผล กฎตรวจข้อมูล repository จัดเก็บ และ exporter สร้างข้อมูลไฟล์ แบ่งตามเหตุผลที่ทำให้เปลี่ยน ไม่ใช่บังคับหนึ่งคลาสต่อหนึ่งฟังก์ชัน
 
-### Open/Closed Principle (OCP)
+### หลักเปิดรับการขยายและปิดการแก้แกนเดิม — Open/Closed Principle (OCP)
 
-The validator accepts an ordered list of `BookingRule` functions. New policy is added by passing another rule when constructing the validator, without changing its evaluation loop or `BookingService`. Rule ordering deliberately determines which error the user sees first. The extension test in `domain/bookingRules.test.ts` proves that an extra policy can be added independently.
+validator รับรายการ `BookingRule` ตามลำดับ เพิ่มนโยบายผ่านกฎที่ส่งตอนสร้างวัตถุได้โดยไม่แก้ลูปหรือ `BookingService` ลำดับกำหนดข้อผิดพลาดแรกที่ผู้ใช้เห็น มีชุดทดสอบเพิ่มกฎแยกใน `domain/bookingRules.test.ts`
 
-### Liskov Substitution Principle (LSP)
+### หลักการใช้แทนกันได้ — Liskov Substitution Principle (LSP)
 
-`MemoryBookingRepository` and `LocalStorageBookingRepository` satisfy the same observable contract: empty initial state, detached snapshots, replacement semantics, and compatible error behavior. The **same contract tests and service workflows run against both implementations** in `repositories/bookingRepository.test.ts`. Similarly, both storage adapters are tested for missing-key and overwrite semantics.
+`MemoryBookingRepository` และ `LocalStorageBookingRepository` รักษาสัญญาเดียวกัน ได้แก่ เริ่มว่าง อ่านสำเนาที่แยกจากข้อมูลต้นฉบับ แทนที่ข้อมูล และส่งข้อผิดพลาดตามเงื่อนไข ใช้ **ชุดทดสอบสัญญาและกรณีใช้งานชุดเดียวกันกับทั้งสองแบบ** ใน `repositories/bookingRepository.test.ts` ตัวเชื่อมต่อพื้นที่จัดเก็บก็ทดสอบการอ่านคีย์ที่ไม่มีและเขียนทับค่าเดียวกัน
 
-TypeScript's `implements` is a compile-time check, not a proof of semantic substitutability. The behavioral tests provide the additional evidence. Different storage availability is permitted: failures throw according to the contract and are handled by the service/store.
+`implements` ตรวจรูปแบบในช่วง compile เท่านั้น ไม่พิสูจน์พฤติกรรมทั้งหมด จึงต้องมีการทดสอบเพิ่ม สภาพพร้อมใช้งานของพื้นที่จัดเก็บต่างกันได้ เพราะสัญญาอนุญาตให้โยนข้อผิดพลาดและให้บริการ/สถานะจัดการต่อ
 
-### Interface Segregation Principle (ISP)
+### หลักแยกสัญญาตามหน้าที่ — Interface Segregation Principle (ISP)
 
-No single interface combines storage, booking operations, validation, calendar export, downloads, and preferences. `BookingRepository` only exposes snapshots, `StorageAdapter` only exposes string storage, and `CalendarExporter` only exposes serialization. The service does not depend on export/download methods; the exporter does not need the repository. Consumers are not required to implement unrelated methods.
+ไม่มี interface เดียวรวมการเก็บข้อมูล คำสั่งจอง การตรวจสอบ ปฏิทิน การดาวน์โหลด และค่ากำหนด `BookingRepository` ดูแลสำเนารายการ `StorageAdapter` ดูแล string และ `CalendarExporter` สร้างข้อมูลไฟล์ บริการไม่ต้องพึ่งคำสั่งส่งออก และ exporter ไม่ต้องพึ่ง repository
 
-### Dependency Inversion Principle (DIP)
+### หลักกลับทิศการพึ่งพา — Dependency Inversion Principle (DIP)
 
-`BookingService` depends on `BookingRepository`, `BookingValidator`, `Clock`, and an ID function. Its source contains no `localStorage`, `window`, `document`, or Zustand calls. `LocalStorageBookingRepository` depends on `StorageAdapter`. The composition root supplies concrete implementations, and tests supply memory adapters and fixed clocks.
+`BookingService` ขึ้นกับ `BookingRepository`, `BookingValidator`, `Clock` และฟังก์ชันสร้าง ID ไม่เรียก `localStorage`, `window`, `document` หรือ Zustand ส่วน repository ขึ้นกับ `StorageAdapter` จุดประกอบส่งคลาสจริง และชุดทดสอบส่งตัวเชื่อมต่อหน่วยความจำกับ clock ที่ควบคุมได้
 
-## Important code examples
+## ตัวอย่างโค้ดสำคัญ
 
-### 1. Extensible validation (actual implementation)
+### 1. กฎตรวจสอบที่ขยายได้
 
-From `src/domain/bookingRules.ts`:
+โค้ดจาก `src/domain/bookingRules.ts`:
 
 ```typescript
 export class BookingRulesValidator implements BookingValidator {
@@ -147,11 +147,11 @@ export class BookingRulesValidator implements BookingValidator {
 }
 ```
 
-This demonstrates SRP (evaluate policy), OCP (inject additional rules), and DIP (inject time). Rules include real calendar-date checks, future start, half-hour operating slots, required details, email, phone, capacity, and conflicts. Cancelled bookings do not block time, and edits exclude their own ID while still checking other reservations.
+แสดง SRP ในการประเมินกฎ OCP ในการรับกฎเพิ่ม และ DIP ในการรับเวลา กฎตรวจชนิดข้อมูล วันที่จริง เวลาอนาคต ช่วงครึ่งชั่วโมง ข้อมูลจำเป็น อีเมล โทรศัพท์ ความจุ และเวลาทับซ้อน รายการยกเลิกไม่กีดกันเวลา ส่วนการแก้ไขไม่นับ ID ของตัวเองแต่ยังตรวจรายการอื่น
 
-### 2. Dependency injection (actual production wiring)
+### 2. การส่ง dependency จากจุดประกอบ
 
-From `src/compositionRoot.ts`:
+โค้ดจาก `src/compositionRoot.ts`:
 
 ```typescript
 const storage = new BrowserStorageAdapter();
@@ -162,7 +162,7 @@ const service = new BookingService(repository, validator, systemClock, () => cry
 export const useStore = createBookingStore(service, preferences);
 ```
 
-The constructor in `src/services/bookingService.ts` accepts abstractions:
+constructor ใน `src/services/bookingService.ts` รับสัญญา:
 
 ```typescript
 constructor(
@@ -173,13 +173,13 @@ constructor(
 ) {}
 ```
 
-The service never constructs its own repository. Its cancellation method checks `canCancel` before writing, so the UI button is not the only policy gate.
+บริการไม่สร้าง repository เอง การยกเลิกตรวจ `canCancel` ก่อนเขียน จึงไม่ได้พึ่งปุ่ม disabled เป็นจุดตรวจเพียงจุดเดียว
 
-## Component diagram
+## แผนภาพส่วนประกอบ
 
 ```mermaid
 flowchart TD
-  Main[main.tsx: framework providers] --> App[App: page and dialog coordination]
+  Main[main.tsx: เริ่มต้นเฟรมเวิร์ก] --> App[App: ประสานหน้าและกล่องโต้ตอบ]
   App --> Sidebar
   App --> Header
   App --> Overview[RoomOverview / Stat]
@@ -188,10 +188,10 @@ flowchart TD
   App --> Insights[InsightsView]
   App --> Form[BookingDialog]
   App --> Dialogs[SuccessDialog / TutorialDialog / Modal]
-  App --> Store[createBookingStore: in-memory Zustand]
+  App --> Store[createBookingStore: สถานะในหน่วยความจำ]
   Store --> Service[BookingService]
   Store --> Preferences[PreferencesService]
-  Timeline --> Domain[Domain rules and selectors]
+  Timeline --> Domain[กฎและตัวคัดเลือกข้อมูลโดเมน]
   Bookings --> Domain
   Insights --> Domain
   Form --> Domain
@@ -199,13 +199,15 @@ flowchart TD
   Service --> Repo[BookingRepository]
   App --> Export[IcsCalendarExporter]
   App --> Download[BrowserFileDownloader]
-  Root[compositionRoot.ts: dependency wiring] -. constructs .-> Store
-  Root -. constructs .-> Service
-  Root -. constructs .-> Export
-  Root -. constructs .-> Download
+  Root[compositionRoot.ts: ประกอบ dependency] -. สร้าง .-> Store
+  Root -. สร้าง .-> Service
+  Root -. สร้าง .-> Export
+  Root -. สร้าง .-> Download
 ```
 
-## Class/interface diagram
+## แผนภาพคลาสและ interface
+
+ชื่อคลาส เมธอด ชนิดข้อมูล และเครื่องหมาย `interface` คงตรงกับโค้ดเพื่อให้ตรวจสอบได้
 
 ```mermaid
 classDiagram
@@ -267,100 +269,95 @@ classDiagram
   BookingService --> Clock
 ```
 
-`CalendarFile` is the filename/content/MIME metadata interface returned by `CalendarExporter`. The ID factory is a function dependency, not a separate class. `BookingRule` is a function type, not a class hierarchy.
+`CalendarFile` คือสัญญาข้อมูลชื่อไฟล์ เนื้อหา และ MIME ที่ exporter คืนมา ตัวสร้าง ID เป็นฟังก์ชัน และ `BookingRule` เป็นชนิดฟังก์ชัน ไม่ได้สร้างลำดับสืบทอดคลาสที่ไม่จำเป็น
 
-## Booking data flow diagram
+## แผนภาพการไหลของข้อมูลการจอง
 
 ```mermaid
 sequenceDiagram
-  actor User
+  actor User as ผู้ใช้
   participant UI as BookingDialog
-  participant Store as Zustand actions
+  participant Store as คำสั่ง Zustand
   participant Service as BookingService
   participant Rules as BookingValidator
   participant Repo as BookingRepository
   participant Storage as StorageAdapter
-  User->>UI: Enter room, date, times and details
+  User->>UI: กรอกห้อง วัน เวลา และรายละเอียด
   UI->>Store: validate(draft, editingId)
   Store->>Service: validate(draft, editingId)
   Service->>Repo: getAll()
-  Repo->>Storage: getItem(legacy key)
-  Storage-->>Repo: Saved envelope or null
-  Repo-->>Service: Booking snapshot
+  Repo->>Storage: getItem(คีย์เดิม)
+  Storage-->>Repo: ข้อมูลที่บันทึกไว้หรือ null
+  Repo-->>Service: สำเนารายการจอง
   Service->>Rules: validate(input, snapshot, editingId)
-  Rules-->>UI: Error or empty string (through service/store)
-  User->>UI: Confirm summary
+  Rules-->>UI: ข้อผิดพลาดหรือ string ว่าง ผ่านบริการและสถานะ
+  User->>UI: ยืนยันข้อมูลสรุป
   UI->>Store: save(input, editingId)
   Store->>Service: save(input, editingId)
-  Service->>Repo: getAll() again
-  Service->>Rules: Revalidate against latest snapshot
-  alt Valid input and successful write
+  Service->>Repo: getAll() อีกครั้ง
+  Service->>Rules: ตรวจซ้ำกับข้อมูลล่าสุด
+  alt ข้อมูลถูกต้องและเขียนสำเร็จ
     Service->>Repo: replaceAll(updated snapshot)
-    Repo->>Storage: setItem(serialized envelope)
-    Storage-->>Service: Write completes (through repository)
-    Service-->>Store: Successful booking result
-    Store-->>UI: Publish state and show success
-  else Policy error or storage failure
-    Service-->>Store: User-facing error; no successful state update
-    Store-->>UI: Render error and retain existing in-memory bookings
+    Repo->>Storage: setItem(ข้อมูลที่แปลงเป็น JSON)
+    Storage-->>Service: เขียนสำเร็จผ่าน repository
+    Service-->>Store: ผลสำเร็จพร้อมรายการใหม่
+    Store-->>UI: ปรับสถานะและแสดงผลสำเร็จ
+  else กฎไม่ผ่านหรือจัดเก็บล้มเหลว
+    Service-->>Store: ส่งข้อผิดพลาดโดยไม่ปรับสถานะเป็นสำเร็จ
+    Store-->>UI: แสดงข้อผิดพลาดและรักษารายการในหน่วยความจำ
   end
 ```
 
-The second validation is intentional: the summary is not permission to bypass policy at save time. Cancellation follows the same service/repository boundary and checks **more than 24 hours** before start. Demo creation is an explicitly separate fixture operation and intentionally permits showcasing historical dates.
+การตรวจซ้ำตอนบันทึกจำเป็น เพราะการแสดงสรุปไม่ได้อนุญาตให้ข้ามนโยบาย การยกเลิกใช้ขอบเขตบริการ/repository เดียวกันและต้องเหลือเวลามากกว่า 24 ชั่วโมง ข้อมูลตัวอย่างเป็นคำสั่งแยกที่ตั้งใจอนุญาตให้สาธิตวันที่ในอดีต
 
-## Persistence compatibility and error handling
+## ความเข้ากันได้ของข้อมูลเดิมและการจัดการข้อผิดพลาด
 
-- Bookings keep the existing `kmitl-booking-v1` key and `{ state: { bookings, ... }, version: 0 }` envelope. Existing bookings and unknown fields in `state` are retained.
-- The repository preserves legacy `state.role`; `PreferencesService` reads it as a fallback. Subsequent role choices use the independent `kmitl-role` key.
-- Theme and tutorial continue using `kmitl-dark` and `kmitl-tour` through the preference service.
-- Invalid JSON, invalid booking shapes, and unsupported versions are reported; the original value is not silently overwritten. Recovery from corrupt storage currently requires manually repairing/removing that key after preserving any needed data.
-- A failed write does not update the UI as if the booking succeeded. Service errors are returned to the form/action and exposed by the store. Optional preference storage failures are tolerated for the session.
-- The React error boundary still handles rendering failures. Calendar download and clipboard failures produce notifications.
+- ใช้คีย์ `kmitl-booking-v1` และโครง `{ state: { bookings, ... }, version: 0 }` เดิม รักษารายการและ field เดิมใน `state`
+- repository รักษา `state.role` เก่าไว้ให้ `PreferencesService` อ่านสำรอง การเลือกบทบาทใหม่ใช้ `kmitl-role`
+- ธีมกับคู่มือยังใช้ `kmitl-dark` และ `kmitl-tour` ผ่านบริการค่ากำหนด
+- JSON ผิด รูปแบบรายการผิด เวอร์ชันไม่รองรับ หรือข้อมูลเกินขอบเขตจะแจ้งข้อผิดพลาดและไม่ถูกเขียนทับ ต้องสำรองแล้วซ่อมหรือลบคีย์ด้วยตนเองหากข้อมูลเสีย
+- การเขียนล้มเหลวไม่ทำให้หน้าจอแสดงว่าจองสำเร็จ ข้อผิดพลาดส่งผ่านบริการและสถานะ ส่วนค่ากำหนดหน้าจอยอมให้ใช้ต่อในรอบนั้นได้
+- error boundary ดูแลการแสดงผลล้มเหลว การดาวน์โหลดหรือ clipboard ล้มเหลวจะแจ้งเตือน
 
-## Verification and regression coverage
-
-Run:
+## การตรวจสอบและการป้องกันข้อผิดพลาดเดิมกลับมา
 
 ```sh
 npm run build
 npm test
 npm run test:e2e
+npm run test:deployment
 npm run format:check
 ```
 
-Tests include valid bookings, capacity boundaries, invalid dates/email/phone/times, overlapping and adjacent intervals, cancelled bookings, self-edits and conflicting edits, exact cancellation cutoff, missing IDs, demo/reset, repository/adapter contracts, legacy data/role reload, corrupt data, write failures, and timezone-correct calendar text. The original six domain tests and eight desktop/mobile browser checks remain present.
+ทดสอบการจองถูกต้อง ขอบเขตความจุ วันที่/อีเมล/โทรศัพท์/เวลาไม่ถูกต้อง เวลาทับซ้อนและต่อกัน รายการยกเลิก การแก้รายการตัวเองและชนรายการอื่น จุดตัดยกเลิก ID ที่ไม่มี ข้อมูลตัวอย่าง/ล้างข้อมูล สัญญา repository/พื้นที่จัดเก็บ การโหลดข้อมูลเดิม ข้อมูลเสีย การเขียนล้มเหลว และปฏิทินตามเขตเวลา
 
-Browser checks cover room searching, demo/reset, persistence, creation/edit/cancel, ICS downloads, keyboard booking, drag selection, capacity filtering, dark mode, and no horizontal page overflow. These are automated checks, not a claim of full accessibility certification or coverage of every device.
+การทดสอบเบราว์เซอร์ครอบคลุมค้นหา สร้าง/แก้ไข/ยกเลิก บันทึกข้ามการโหลดหน้า ดาวน์โหลด ICS คีย์บอร์ด ลาก ตัวกรอง โหมดมืด ข้อความ XSS และหน้าจอคอมพิวเตอร์/มือถือ ไม่ใช่การรับรองการเข้าถึงทั้งหมดหรือทุกอุปกรณ์
 
-## Design decisions and trade-offs
+## เหตุผลการออกแบบและข้อแลกเปลี่ยน
 
-- **Composition over inheritance:** interfaces describe replaceable boundaries; React components remain functions. Classes are used for meaningful service/adapter lifecycles.
-- **Small synchronous contracts:** appropriate for a single-browser student prototype; a remote repository needs async use cases, loading state, and transactional server conflict checks.
-- **Readable rule pipeline:** ordered first-error messages are easier to explain than a generic validation framework. The validator is extensible without decorators or a DI container.
-- **Failure visibility:** no silent fallback to an empty writable repository when saved booking data cannot be read. This favors preserving user data over automatic reset.
-- **Compatibility exports:** `src/domain.ts` and `src/store.ts` remain thin entry points so original tests/imports keep working. New code imports focused modules.
-- **Existing UI retained:** styling, Thai copy, fixed room photos, responsive layout, animation primitives, and mock authentication remain intact.
+- เลือกการประกอบวัตถุแทนการสืบทอดเมื่อเหมาะสม ใช้คลาสกับบริการ/ตัวเชื่อมต่อ และคง function components สำหรับ React
+- สัญญา synchronous ขนาดเล็กเหมาะกับต้นแบบเบราว์เซอร์เดียว การเพิ่มบริการระยะไกลต้องมี async use cases สถานะกำลังโหลด และธุรกรรมตรวจเวลาชนที่ server
+- ลำดับกฎและข้อความแรกเข้าใจง่ายกว่ากรอบ validation ทั่วไป ไม่เพิ่ม decorator หรือ DI container โดยไม่มีความจำเป็น
+- หากอ่านข้อมูลเดิมไม่ได้ จะไม่แอบเปลี่ยนเป็นพื้นที่ว่างที่เขียนทับได้ ให้ความสำคัญกับการรักษาข้อมูล
+- คงทางเข้า `domain.ts` และ `store.ts` ให้โค้ด/ชุดทดสอบเดิม ส่วนโค้ดใหม่ใช้โมดูลตามหน้าที่
+- คงรูปแบบหน้าจอ ภาพห้อง องค์ประกอบการเคลื่อนไหว การรองรับหน้าจอหลายขนาด และบทบาทจำลองไว้ โดยข้อความสำหรับผู้อ่านเป็นภาษาไทย
 
-## Remaining limitations and future refactoring
+## ข้อจำกัดและโอกาสพัฒนาต่อ
 
-1. Authentication is a mock role selector; no institutional sign-in, authorization, server approval workflow, or email delivery exists.
-2. LocalStorage is per browser and origin. No cross-device consistency, cross-tab live subscription, or atomic protection against concurrent browser writes is provided.
-3. The native date picker follows browser locale; Thai captions use Buddhist years. Date grouping uses the existing date-fns/browser calendar semantics.
-4. Wi-Fi is unverified in the supplied catalog, so the Wi-Fi filter yields no verified rooms.
-5. PWA metadata exists, but offline caching/service-worker behavior is not implemented.
-6. Calendar output preserves the prototype's basic event fields; advanced recurrence, invitation delivery, can be added independently to the exporter. UTF-8 line folding and safe download filenames are now implemented and tested.
-7. If requirements grow, extract a dedicated room-catalog interface, split timeline filters/rows further, add async repository contracts and server transactions, and add ESLint/CI/accessibility checks. Avoid adding these abstractions until there is a concrete need.
+1. ยังไม่มีการเข้าสู่ระบบสถาบัน การตรวจสิทธิ์ ขั้นตอนอนุมัติ หรืออีเมลจริง
+2. localStorage แยกตามเบราว์เซอร์/origin ไม่มีความสอดคล้องข้ามเครื่อง การติดตามสดข้ามแท็บ หรือธุรกรรมกันการเขียนชน
+3. ตัวเลือกวันที่และการจัดกลุ่มยังอิงภาษา/ปฏิทินของเบราว์เซอร์ แต่ข้อความวันที่เป็นไทยและพุทธศักราช
+4. ยังไม่ยืนยัน Wi-Fi ของห้อง ตัวกรองจึงไม่พบห้องที่ยืนยันได้
+5. มีข้อมูลกำกับ PWA แต่ยังไม่มี service worker/การใช้งานออฟไลน์
+6. ปฏิทินมีการเข้ารหัสและตัดบรรทัด UTF-8 แล้ว แต่ยังไม่มีเหตุการณ์ซ้ำหรือการส่งคำเชิญ
+7. หากขอบเขตเพิ่ม ค่อยแยกสัญญารายการห้อง แยกตาราง/ตัวกรองย่อย เพิ่ม async repository, server transactions, ESLint และการตรวจการเข้าถึงใน CI
 
-## Suggested oral presentation explanation
+## ความปลอดภัยและการติดตั้งอัตโนมัติ
 
-> We retained React and TypeScript because this project is an interactive browser application with an existing React codebase. SOLID is independent of programming language: our components have focused responsibilities, our validation rules are extensible, and our booking service receives repository and validator interfaces through dependency injection. We prove substitutability by running the same repository contract tests against memory and localStorage implementations. We do not claim Python or PEP 8 compliance; we demonstrate the architecture criteria using strict TypeScript, modular design, and consistent TypeScript formatting.
+โมดูล `security/` ตรวจชนิด ความยาว รูปแบบรายการ ID ซ้ำ และขนาดข้อมูล ร่วมกันระหว่างกฎกับ repository แต่ไม่สร้างขอบเขตตรวจสิทธิ์ที่เชื่อถือได้ในเบราว์เซอร์ ดู [วิเคราะห์ภัยคุกคาม](threat-model.md), [การเขียนโค้ดอย่างปลอดภัย](secure-coding.md) และ [ตารางตรวจสอบย้อนกลับ](traceability-matrix.md)
 
-Thai version:
+การสร้างสำหรับ GitHub Pages ใช้ HashRouter กับ base path ส่วนการใช้งานในเครื่องคง BrowserRouter สคริปต์ใน `deployment/` ติดตั้งและให้บริการไฟล์ที่สร้าง ส่ง response headers ในเครื่อง และเก็บหลักฐานการตรวจ GitHub Actions แยก CI สิทธิ์อ่าน การสร้างไฟล์ Pages การติดตั้งที่ต้องมีสิทธิ์ และการตรวจ revision ที่ติดตั้ง อ้างผลจริงจาก run URL ไม่ใช้การมี YAML แทนหลักฐาน
 
-> โครงการนี้ใช้ React และ TypeScript เพราะเป็นเว็บแอปที่มีหน้าจอแบบโต้ตอบและมีโค้ด React อยู่แล้วครับ/ค่ะ หลัก SOLID ไม่ได้จำกัดเฉพาะ Python เราแยกหน้าที่ของ component, validation, service และ persistence ชัดเจน โดยให้ BookingService รับ interface ผ่าน dependency injection และทดสอบว่า repository แบบ memory กับ localStorage ใช้แทนกันได้ตามสัญญาเดียวกัน เราไม่ได้อ้างว่าทำตาม PEP 8 หรือใช้ Python แต่แสดงหลักการออกแบบ สถาปัตยกรรม cohesion และ coupling ด้วย TypeScript ครับ/ค่ะ
+## แนวอธิบายในการนำเสนอ
 
-## Rubric extension: security and automatic deployment
-
-The additional runtime boundary module is shared by domain validation and repository decoding. It checks input shapes, length limits, saved record structure, unique IDs, and resource bounds; it does not add trusted authorization to browser code. See [Threat Model](threat-model.md), [Secure Coding](secure-coding.md), and [Traceability](traceability-matrix.md).
-
-The production GitHub Pages build selects HashRouter and a configured base path while local/browser builds preserve BrowserRouter. Infrastructure scripts in `deployment/` install and serve the built artifact, send local response headers, and capture smoke evidence. GitHub Actions separates read-only CI, Pages build, privileged deployment, and installed-revision verification. CI/CD execution status must be supported by actual run URLs rather than the presence of YAML.
+> โครงการนี้ใช้ React และ TypeScript เพราะเป็นเว็บแอปโต้ตอบที่มีโค้ด React อยู่แล้ว หลัก SOLID ไม่จำกัดเฉพาะ Python เราแยกหน้าที่ของส่วนหน้าจอ กฎตรวจสอบ บริการ และการจัดเก็บ ให้ BookingService รับ interface ผ่าน dependency injection และทดสอบว่า repository แบบหน่วยความจำกับ localStorage ใช้แทนกันตามสัญญาเดียวกันได้ เราไม่ได้อ้างว่าใช้ Python หรือผ่าน PEP 8 แต่แสดงหลักการออกแบบ สถาปัตยกรรม ความเป็นเอกภาพของหน้าที่ และการพึ่งพากันต่ำด้วย TypeScript โดยต้องให้อาจารย์ยอมรับการใช้ภาษานี้ก่อน

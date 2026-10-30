@@ -1,103 +1,115 @@
-# KMITL Room Booking
+# ระบบจองห้องประชุม KMITL
 
-Thai-first meeting room booking prototype, rebuilt from the supplied KMITL capture. React 18, TypeScript, Vite, Tailwind v4, Motion, Radix Dialog, Zustand, React Router, and date-fns.
+ต้นแบบเว็บแอปจองห้องประชุมภาษาไทย พัฒนาจากข้อมูลและภาพหน้าจอ KMITL ที่ผู้ใช้จัดเตรียม ใช้ React 18, TypeScript, Vite, Tailwind CSS v4, Motion, Radix Dialog, Zustand, React Router และ date-fns
 
-## Run
+## เว็บไซต์และผลติดตั้งจริง
+
+[เปิดเว็บสาธิต](https://pootanapat.github.io/smart-campus-booking/)
+
+ระบบผ่านการตรวจ CI, สร้างไฟล์เว็บไซต์, ติดตั้งบน GitHub Pages และตรวจ HTTPS/revision ใน [รอบการทำงาน 41059099454](https://github.com/Pootanapat/smart-campus-booking/actions/runs/41059099454) สำหรับ revision `6d753268cb1d93a5a64464b19acfcc07785fcdc2` ดู [หลักฐานจากระบบติดตั้ง](docs/evidence/pages-deployment.json) และ [ผลตรวจเว็บจริงบนคอมพิวเตอร์และมือถือ](docs/evidence/live-browser.json)
+
+หลักฐานผูกกับ revision ที่ระบุ การแก้ไขภายหลังไม่ได้อยู่ในรอบเดิม ทุกการติดตั้งใหม่ตรวจ revision และสร้างหลักฐานของตนเอง ดูผลล่าสุดได้ที่ [GitHub Actions](https://github.com/Pootanapat/smart-campus-booking/actions)
+
+## เริ่มใช้งานในเครื่อง
 
 ```sh
 npm install
 npm run dev
 ```
 
-All five rooms start with zero bookings. The optional demo button adds two bookings to the selected date. Clear data restores an empty schedule after confirmation. Bookings and the mock role persist locally. The tour appears on first visit and dark mode is saved separately.
+ทุกห้องเริ่มต้นโดยไม่มีรายการจอง ปุ่มโหลดข้อมูลตัวอย่างเพิ่มการจองสองรายการในวันที่เลือก และปุ่มล้างข้อมูลคืนตารางว่างหลังยืนยัน รายการจองกับบทบาทจำลองบันทึกไว้ในเบราว์เซอร์ มีคำแนะนำเมื่อเข้าใช้ครั้งแรกและบันทึกการเลือกโหมดมืดแยกต่างหาก
 
-## Architecture overview
+## ภาพรวมสถาปัตยกรรม
 
-- `src/main.tsx` mounts the framework providers; `src/App.tsx` coordinates pages and dialogs.
-- `src/components/` contains focused timeline, booking form/list, statistics, navigation, and dialog components.
-- `src/domain/` contains room data, extensible validation rules, cancellation policy, conflict detection, selectors, and booking factories.
-- `src/services/` contains booking use cases, pure ICS serialization, browser downloads, and preference handling.
-- `src/repositories/` contains booking repositories and storage adapters.
-- `src/types/` defines shared models and small contracts; `src/utils/` holds date/time and class-name helpers.
-- `src/state/` adapts successful service results to in-memory Zustand state. Persistence is owned by the repository, not state middleware.
-- `src/compositionRoot.ts` wires concrete dependencies. Thin `domain.ts` and `store.ts` compatibility exports preserve original consumers.
+- `src/main.tsx` เริ่มต้น React และตัวครอบการทำงานของเฟรมเวิร์ก ส่วน `src/App.tsx` ประสานหน้าจอและกล่องโต้ตอบ
+- `src/components/` แยกส่วนตารางเวลา แบบฟอร์ม รายการจอง สถิติ เมนู และกล่องโต้ตอบตามหน้าที่
+- `src/domain/` เก็บข้อมูลห้อง กฎตรวจสอบที่ขยายได้ นโยบายยกเลิก การตรวจเวลาทับซ้อน ตัวคัดเลือกข้อมูล และตัวสร้างรายการจอง
+- `src/services/` ประสานกรณีใช้งาน สร้างข้อมูล ICS จัดการดาวน์โหลด และจัดการค่ากำหนดผู้ใช้
+- `src/repositories/` แยกการอ่านเขียนรายการจองและตัวเชื่อมต่อพื้นที่จัดเก็บ
+- `src/security/` ตรวจชนิด รูปแบบ ความยาว และขนาดข้อมูลจริงขณะทำงาน
+- `src/types/` กำหนดแบบจำลองและสัญญาการทำงาน ส่วน `src/utils/` เก็บฟังก์ชันช่วยเรื่องวันเวลาและชื่อคลาส
+- `src/state/` ปรับผลจากบริการเป็นสถานะ Zustand ในหน่วยความจำ การจัดเก็บถาวรเป็นหน้าที่ของ repository
+- `src/compositionRoot.ts` ประกอบ dependency ที่ใช้งานจริง ส่วน `domain.ts` และ `store.ts` เป็นทางเข้าที่คงความเข้ากันได้กับโค้ดเดิม
 
-See [Architecture and SOLID](docs/architecture-and-solid.md) for component/class responsibilities, Mermaid diagrams, actual code examples, design trade-offs, the rubric mapping, and an English/Thai presentation explanation.
+อ่าน [สถาปัตยกรรมและ SOLID](docs/architecture-and-solid.md) สำหรับหน้าที่ของคลาส/ส่วนประกอบ แผนภาพ Mermaid ตัวอย่างโค้ด เหตุผลการออกแบบ และการเทียบเกณฑ์
 
-## How SOLID is applied
+## การประยุกต์ใช้ SOLID
 
-| Principle | Concrete evidence                                                                                                      |
-| --------- | ---------------------------------------------------------------------------------------------------------------------- |
-| SRP       | UI, validation, use cases, persistence, calendar serialization, and downloads are separate                             |
-| OCP       | `BookingRulesValidator` accepts additional ordered rule functions without changing its algorithm                       |
-| LSP       | Memory/localStorage repositories and storage adapters pass shared behavioral contracts                                 |
-| ISP       | Focused `BookingRepository`, `StorageAdapter`, `BookingValidator`, `CalendarExporter`, and `FileDownloader` interfaces |
-| DIP       | `BookingService` receives repository/validator/clock/ID dependencies; the repository receives a storage interface      |
+| หลักการ | หลักฐานในระบบ                                                                                                         |
+| ------- | --------------------------------------------------------------------------------------------------------------------- |
+| SRP     | แยกหน้าจอ กฎตรวจสอบ กรณีใช้งาน การจัดเก็บ การสร้างปฏิทิน และการดาวน์โหลด                                              |
+| OCP     | `BookingRulesValidator` รับกฎใหม่เพิ่มได้โดยไม่แก้ลูปประเมินกฎ                                                        |
+| LSP     | repository แบบหน่วยความจำและ localStorage ผ่านชุดทดสอบสัญญาพฤติกรรมเดียวกัน                                           |
+| ISP     | แยก `BookingRepository`, `StorageAdapter`, `BookingValidator`, `CalendarExporter` และ `FileDownloader`                |
+| DIP     | `BookingService` รับ repository/validator/clock/ตัวสร้าง ID ผ่าน constructor และ repository รับสัญญาของพื้นที่จัดเก็บ |
 
-## Technology Stack and Rubric Compatibility
+## เทคโนโลยีและความสอดคล้องกับเกณฑ์ประเมิน
 
-The implementation remains React and TypeScript. SOLID principles are language-independent object-oriented design principles; TypeScript interfaces, classes, modules, and constructor dependency injection provide the architectural equivalents used here. Python and PEP 8 requirements have **not** been fulfilled or claimed. PEP 8 is Python-specific; this code uses strict TypeScript, PascalCase/camelCase naming, modular responsibilities, and Prettier formatting instead. Common ESLint-style conventions are used, but ESLint is not installed. The documentation maps the architecture criteria to the actual TypeScript implementation; instructor approval of language-specific requirements is separate.
+ระบบคง React และ TypeScript ไว้ หลัก SOLID ไม่จำกัดภาษา จึงใช้ interface, class, module และ constructor dependency injection ของ TypeScript แสดงหลักการเดียวกัน อย่างไรก็ตาม **ไม่ได้ใช้ Python และไม่อ้างว่าผ่าน PEP 8** ซึ่งเป็นแนวทางเฉพาะ Python
 
-## Validation commands
+โค้ดใช้ strict TypeScript การตั้งชื่อ PascalCase/camelCase การแยกหน้าที่ และ Prettier ตามธรรมเนียม TypeScript ใช้แนวการตั้งชื่อที่พบร่วมกับ ESLint แต่ยังไม่ได้ติดตั้ง ESLint การเทียบหลักการออกแบบไม่ใช่การยกเว้นข้อกำหนดภาษา ต้องให้อาจารย์ยอมรับการใช้ TypeScript ก่อน
+
+## คำสั่งตรวจสอบ
 
 ```sh
 npm run build
 npm test
-npx playwright install chromium  # first-time browser setup
+npx playwright install chromium  # ติดตั้งเบราว์เซอร์สำหรับการทดสอบครั้งแรก
 npm run test:e2e
+npm run test:deployment
 npm run format:check
 ```
 
-`npm test` runs the original domain tests plus validation, service, repository/storage contract, persistence-failure, and calendar serialization tests. `npm run test:e2e` runs the existing workflow suite on desktop and mobile viewports. `npm run format` formats source, tests, documentation, and configuration.
+`npm test` ตรวจตรรกะโดเมน บริการ สัญญา repository/พื้นที่จัดเก็บ การจัดเก็บล้มเหลว และการสร้างไฟล์ปฏิทิน ส่วน `npm run test:e2e` ตรวจขั้นตอนใช้งานบนคอมพิวเตอร์และมือถือ ใช้ `npm run format` จัดรูปแบบโค้ด ชุดทดสอบ เอกสาร และไฟล์กำหนดค่า
 
-## Booking and persistence behavior
+## พฤติกรรมการจองและการบันทึกข้อมูล
 
-The timeline supports pointer drag in either direction, click, and keyboard Enter. Use the booking dialog on touch devices if horizontal scrolling makes dragging inconvenient. Times are Thailand time (UTC+7); date captions use the Thai Buddhist calendar, while the native date input follows browser locale. Invalid calendar dates, past starts, invalid durations, overlaps, bad contact details, and excess capacity are rejected. Cancellation requires **more than 24 hours** before start and is enforced by the service as well as the UI.
+ตารางเวลารองรับการลากทั้งสองทิศ คลิก และกด Enter บนอุปกรณ์สัมผัสสามารถใช้แบบฟอร์มแทนการลากหากต้องเลื่อนตารางแนวนอน เวลาเป็นเวลาประเทศไทย (UTC+7) ข้อความวันที่แสดงปีพุทธศักราช แต่ตัวเลือกวันที่มาตรฐานขึ้นอยู่กับภาษาเบราว์เซอร์
 
-Existing bookings retain the `kmitl-booking-v1` key and original saved envelope. Legacy role values are read as fallback; new role selections use `kmitl-role`. Corrupt/unsupported saved data is reported and preserved rather than silently reset. A failed booking write leaves in-memory booking state unchanged. Optional theme/tutorial/role preferences still work for the session if preference storage fails.
+ระบบปฏิเสธวันที่ไม่มีจริง เวลาเริ่มในอดีต ระยะเวลาไม่ถูกต้อง เวลาทับซ้อน ข้อมูลติดต่อผิด และจำนวนผู้เข้าร่วมเกินความจุ ยกเลิกได้เมื่อเหลือเวลา **มากกว่า 24 ชั่วโมง** โดยตรวจทั้งในบริการและหน้าจอ
 
-## Known prototype limitations
+รายการเดิมยังใช้คีย์ `kmitl-booking-v1` และรูปแบบข้อมูลเดิม บทบาทเก่าถูกอ่านเป็นค่าสำรอง ส่วนการเลือกใหม่ใช้ `kmitl-role` ข้อมูลเสียหรือเวอร์ชันที่ไม่รองรับจะแจ้งข้อผิดพลาดและเก็บต้นฉบับไว้ หากบันทึกไม่สำเร็จ สถานะรายการจองในหน่วยความจำจะไม่เปลี่ยน ค่ากำหนดหน้าจอยังคงใช้ในรอบการใช้งานนั้นได้แม้จัดเก็บไม่ได้
 
-- Roles are mock identities, with a shared browser workspace rather than real user accounts. No backend, institutional login, authorization, email delivery, or server approval workflow exists.
-- LocalStorage is specific to this browser/origin. No cross-device locking, cross-tab live updates, or atomic multi-client conflict protection exists. An API-backed version needs asynchronous interfaces and server transactions.
-- Corrupt saved data requires manually repairing/removing its storage key after preserving needed data; it is not automatically overwritten.
-- Wi-Fi is not confirmed in the provided equipment catalog; its filter yields no verified rooms.
-- Date captions are Thai/Buddhist; the native picker and date grouping retain browser calendar behavior.
-- Demo bookings intentionally bypass future-time rules for showcasing selected dates, but normal saves do not.
-- Calendar export handles basic event fields, escaping, and UTC times; recurrence and invitation delivery remain future work. UTF-8 line folding and safe filenames are implemented.
-- Room photos are copied from the user's saved HTML companion folder. PWA manifest/icon metadata exists; offline caching and service-worker installation remain future work.
+## ข้อจำกัดของต้นแบบ
+
+- บทบาทเป็นข้อมูลจำลองในพื้นที่ทำงานร่วมของเบราว์เซอร์ ยังไม่มีบัญชีผู้ใช้จริง บริการหลังบ้าน การเข้าสู่ระบบสถาบัน การตรวจสิทธิ์ การส่งอีเมล หรือขั้นตอนอนุมัติที่เชื่อถือได้
+- localStorage แยกตามเบราว์เซอร์และ origin ไม่มีการล็อกข้ามเครื่อง การปรับข้อมูลสดข้ามแท็บ หรือธุรกรรมที่ป้องกันการเขียนชนกันหลายผู้ใช้ การเพิ่ม API ต้องออกแบบสัญญาแบบ asynchronous และธุรกรรมฝั่ง server
+- ข้อมูลเสียต้องซ่อมหรือลบคีย์ด้วยตนเองหลังสำรองสิ่งที่ต้องการ ระบบไม่เขียนทับอัตโนมัติ
+- Wi-Fi ยังไม่มีข้อมูลยืนยันในรายการอุปกรณ์ ตัวกรองนี้จึงไม่พบห้องที่ยืนยันว่ามี Wi-Fi
+- ข้อความวันที่เป็นภาษาไทย/ปีพุทธศักราช ส่วนตัวเลือกวันที่และการจัดกลุ่มยังอิงปฏิทินของเบราว์เซอร์
+- ข้อมูลตัวอย่างข้ามกฎเวลาอนาคตเพื่อสาธิตวันที่เลือก แต่การบันทึกทั่วไปยังตรวจตามกฎ
+- ปฏิทินรองรับข้อมูลเหตุการณ์พื้นฐาน การเข้ารหัสข้อความ เวลา UTC การตัดบรรทัด UTF-8 และชื่อไฟล์ที่ปลอดภัย ยังไม่รองรับเหตุการณ์ซ้ำหรือการส่งคำเชิญ
+- ภาพห้องคัดลอกจากแฟ้มประกอบ HTML ที่ผู้ใช้ให้มา มีข้อมูล manifest/ไอคอนสำหรับ PWA แต่ยังไม่มีการเก็บแคชใช้งานออฟไลน์หรือ service worker
 
 ## ชุดหลักฐานตามเกณฑ์อาจารย์ทั้งสองท่าน
 
-เริ่มที่ [Rubric Coverage](docs/rubric-coverage.md) เพื่อดูส่วนที่ทำจริงและส่วนที่ยังต้องมีหลักฐาน/การยอมรับจากอาจารย์ โดยเฉพาะ **Python/PEP 8** ซึ่ง TypeScript ไม่ได้ทำให้ผ่านข้อกำหนดภาษานี้โดยอัตโนมัติ
+เริ่มที่ [ตารางเทียบเกณฑ์และหลักฐาน](docs/rubric-coverage.md) ซึ่งแยกสิ่งที่ทำแล้วออกจากข้อกำหนดที่ยังต้องยืนยัน
 
-- [Architecture / Class Diagram / SOLID](docs/architecture-and-solid.md)
-- [Threat Model: DFD, Misuse Cases, Asset List, Security Requirements](docs/threat-model.md)
-- [Risk Register](docs/risk-register.md) และ [CSV](docs/risk-register.csv)
-- [Secure Coding และ Refactor พร้อม test references](docs/secure-coding.md)
-- [Traceability Matrix](docs/traceability-matrix.md)
-- [Git Collaboration และประวัติที่ตรวจพบจริง](docs/team-collaboration.md)
-- [Automatic Installation / CI / CD / ผลติดตั้ง](docs/deployment-and-ci-cd.md)
-- [เนื้อหาสไลด์ 16 หน้า / Live Demo / Q&A ภาษาไทย](docs/presentation-guide.md)
+- [สถาปัตยกรรม แผนภาพคลาส และ SOLID](docs/architecture-and-solid.md)
+- [วิเคราะห์ภัยคุกคาม: DFD กรณีใช้งานผิดวัตถุประสงค์ ทรัพย์สิน และข้อกำหนดความปลอดภัย](docs/threat-model.md)
+- [ทะเบียนความเสี่ยง](docs/risk-register.md) และ [ไฟล์ CSV](docs/risk-register.csv)
+- [การเขียนโค้ดอย่างปลอดภัยและการปรับโครงสร้าง](docs/secure-coding.md)
+- [ตารางตรวจสอบย้อนกลับ](docs/traceability-matrix.md)
+- [การทำงานร่วมกันผ่าน Git และประวัติจริง](docs/team-collaboration.md)
+- [การติดตั้งอัตโนมัติ CI/CD และผลติดตั้ง](docs/deployment-and-ci-cd.md)
+- [เนื้อหาสไลด์ 16 หน้า บทสาธิต และแนวตอบคำถาม](docs/presentation-guide.md)
 
-## Automatic deployment
+## การติดตั้งอัตโนมัติ
 
 ```sh
 npm run test:deployment
 npm run deploy:local
 npm run serve:deployment
-# เปิดอีก terminal
+# เปิดอีกเทอร์มินัล
 npm run smoke:deployment
 ```
 
-Local installed preview: `http://127.0.0.1:5190`; หลักฐาน smoke อยู่ใน `docs/evidence/local-deployment.json` ส่วน `.github/workflows/ci-cd.yml` เตรียม CI สำหรับทุก push/PR และ Pages CD หลัง main ผ่าน checks ต้องเปิด Pages source เป็น GitHub Actions และมี remote run/deployed URL จริงก่อนอ้างว่าติดตั้งสำเร็จบน GitHub
+เว็บที่ติดตั้งในเครื่องอยู่ที่ `http://127.0.0.1:5190` หลักฐานอยู่ใน `docs/evidence/local-deployment.json` ส่วน `.github/workflows/ci-cd.yml` ตรวจทุกการ push/เปิด PR และติดตั้งบน Pages หลัง `main` ผ่านการตรวจ เปิดใช้งาน Pages แบบ GitHub Actions และตรวจติดตั้งจริงแล้วตามหลักฐานข้างต้น
 
-Security additions ได้แก่ runtime type/length limits, persisted schema/count/byte limits, stored-XSS regression, safe calendar escaping/UTF-8 folding, static response headers และ SHA-pinned/least-privilege Actions ดูข้อจำกัดเรื่อง mock role/PII/localStorage ใน Threat Model ก่อนใช้ข้อมูลจริง
+มาตรการที่เพิ่มประกอบด้วยการตรวจข้อมูลขณะทำงาน การจำกัดข้อมูลจัดเก็บ การทดสอบข้อความ XSS การส่งออกปฏิทินอย่างปลอดภัย response headers ของ server ในเครื่อง และ Actions ที่ตรึง SHA/จำกัดสิทธิ์ ดูขอบเขตการป้องกันในเอกสารวิเคราะห์ภัยคุกคามก่อนใช้ข้อมูลจริง
 
-## Verified public deployment
+PR [#3](https://github.com/Pootanapat/smart-campus-booking/pull/3) รวมงานตามการอนุมัติของเจ้าของงานแล้ว ยังต้องยืนยันเรื่อง Python/PEP 8 และเก็บหลักฐานการทำคุณลักษณะ/การตรวจโค้ดจริงของสมาชิกทีมเพิ่มเติม
 
-เว็บไซต์: [KMITL Room Booking](https://pootanapat.github.io/smart-campus-booking/)
+## การใช้ภาษา
 
-PR [#3](https://github.com/Pootanapat/smart-campus-booking/pull/3) merge ตามการอนุญาตของเจ้าของงานแล้ว ผล CI, Pages build, deploy และ HTTPS/revision verification ผ่านจริงใน [Actions run 41059099454](https://github.com/Pootanapat/smart-campus-booking/actions/runs/41059099454) สำหรับ revision `6d753268cb1d93a5a64464b19acfcc07785fcdc2` ดู [artifact](docs/evidence/pages-deployment.json) และ [live desktop/mobile checks](docs/evidence/live-browser.json)
-
-นี่เป็นหลักฐานของ revision ที่ระบุ ไม่ใช่การอ้างว่าการแก้เอกสารภายหลังอยู่ใน deployment เดิม ทุก deployment ใหม่ตรวจ revision และสร้าง artifact ของตนเอง ยังต้องยืนยัน Python/PEP 8 กับอาจารย์ และเก็บ feature contribution/peer review จริงของทีมเพิ่มเติม
+ดู [คำศัพท์และส่วนที่คงภาษาอังกฤษ](docs/language-guide.md) ข้อความหน้าจอและเอกสารใช้ภาษาไทย ส่วนตัวระบุในโค้ด คำสั่ง มาตรฐาน และหลักฐานเดิมคงต้นฉบับเพื่อความถูกต้อง

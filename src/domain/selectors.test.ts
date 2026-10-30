@@ -18,16 +18,16 @@ const booking: Booking = {
   status: 'confirmed',
 };
 const filters = { query: '', capacity: 0, equipment: [], available: false, range: [540, 600] };
-describe('room availability and dashboard selectors', () => {
-  it('searches Thai, English and room numbers', () => {
+describe('ตัวคัดเลือกความว่างของห้องและข้อมูลสถิติ', () => {
+  it('ค้นหาด้วยชื่อไทย ชื่ออังกฤษ และหมายเลขห้อง', () => {
     for (const query of ['บุนนาค', 'BUNNAG', '701'])
       expect(filterRooms(rooms, [], { ...filters, query }).map((r) => r.id)).toEqual(['701']);
   });
-  it('filters capacity and unverified Wi-Fi equipment', () => {
+  it('กรองความจุและอุปกรณ์ Wi-Fi ที่ยังไม่ยืนยัน', () => {
     expect(filterRooms(rooms, [], { ...filters, capacity: 100 })).toHaveLength(1);
     expect(filterRooms(rooms, [], { ...filters, equipment: ['Wi-Fi'] })).toEqual([]);
   });
-  it('omits cancelled bookings and other dates from availability', () => {
+  it('ไม่นับรายการยกเลิกและวันที่อื่นในการตรวจความว่าง', () => {
     expect(
       activeBookingsOn(
         [
@@ -39,7 +39,7 @@ describe('room availability and dashboard selectors', () => {
       ),
     ).toEqual([booking]);
   });
-  it('filters occupied rooms and allows adjacent slots', () => {
+  it('กรองห้องที่มีจองและอนุญาตช่วงเวลาต่อกัน', () => {
     expect(
       filterRooms(rooms, [booking], { ...filters, available: true }).map((r) => r.id),
     ).not.toContain('701');
@@ -47,7 +47,7 @@ describe('room availability and dashboard selectors', () => {
       filterRooms(rooms, [booking], { ...filters, available: true, range: [600, 630] }),
     ).toHaveLength(5);
   });
-  it('excludes cancelled bookings from metrics', () => {
+  it('ไม่รวมรายการยกเลิกในตัวชี้วัด', () => {
     const result = bookingStatistics([
       booking,
       { ...booking, id: 'cancelled', status: 'cancelled' },
@@ -58,7 +58,7 @@ describe('room availability and dashboard selectors', () => {
     expect(result.peakCounts[2]).toBe(1);
     expect(result.peakCounts[3]).toBe(0);
   });
-  it('groups by date without mutating the repository snapshot', () => {
+  it('จัดกลุ่มตามวันที่โดยไม่เปลี่ยนสำเนาข้อมูลต้นฉบับ', () => {
     const bookings = [booking, { ...booking, id: 'past', date: '2029-12-31' }];
     expect(selectBookings(bookings, 'today', new Date('2030-01-03T12:00:00+07:00'))).toEqual([
       booking,

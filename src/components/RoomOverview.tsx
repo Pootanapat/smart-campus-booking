@@ -9,7 +9,7 @@ export function RoomOverview({ active, date }: { active: Booking[]; date: string
       <section className="hero">
         <div className="hero-copy">
           <span className="hero-tag">
-            <span /> READY FOR YOUR NEXT BIG IDEA
+            <span /> พร้อมสำหรับทุกไอเดียใหม่ของคุณ
           </span>
           <h2>
             ทุกการประชุมที่ดี
@@ -50,11 +50,11 @@ export function RoomOverview({ active, date }: { active: Booking[]; date: string
             <span>
               <Check size={15} />
             </span>{' '}
-            Your next meeting, sorted.
+            พร้อมสำหรับการประชุมครั้งต่อไป
           </div>
           <span className="art-spark">✧</span>
         </div>
-        <div className="hero-corner">MEET. CONNECT. CREATE.</div>
+        <div className="hero-corner">ประชุม เชื่อมต่อ สร้างสรรค์</div>
       </section>
       <section className="stats">
         <Stat
