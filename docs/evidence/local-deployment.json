@@ -1,0 +1,36 @@
+{
+  "environment": "local-static",
+  "checkedAt": "2026-10-30T12:42:12.095Z",
+  "baseUrl": "http://127.0.0.1:5190",
+  "checks": [
+    {
+      "path": "/assets/index-D26nA5R6.js",
+      "status": 200
+    },
+    {
+      "path": "./",
+      "status": 200
+    },
+    {
+      "path": "/bookings",
+      "status": 200
+    },
+    {
+      "path": "/rooms/701.jpg",
+      "status": 200
+    },
+    {
+      "path": "/.git/config",
+      "status": 403
+    },
+    {
+      "path": "/%5c..%5cpackage.json",
+      "status": 403
+    },
+    {
+      "path": "/missing.js",
+      "status": 404
+    }
+  ],
+  "passed": true
+}

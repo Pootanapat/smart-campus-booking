@@ -1,0 +1,12 @@
+{
+  "environment": "github-actions-ci",
+  "runId": 41058420995,
+  "url": "https://github.com/Pootanapat/smart-campus-booking/actions/runs/41058420995",
+  "revision": "faa0b75da6d75fd7d882a30df280365aa4636b82",
+  "status": "completed",
+  "conclusion": "success",
+  "event": "push",
+  "createdAt": "2026-10-30T12:50:37Z",
+  "updatedAt": "2026-10-30T12:51:32Z",
+  "note": "CI verification passed on review branch; Pages deployment jobs were skipped because ref is not main."
+}
