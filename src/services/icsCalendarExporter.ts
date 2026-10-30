@@ -42,7 +42,7 @@ export class IcsCalendarExporter implements CalendarExporter {
       `DTSTART:${utcStamp(new Date(bookingTimestamp(booking.date, booking.start)))}`,
       `DTEND:${utcStamp(new Date(bookingTimestamp(booking.date, booking.end)))}`,
       `SUMMARY:${escapeText(booking.purpose)}`,
-      `LOCATION:KMITL Room ${escapeText(booking.roomId)}`,
+      `LOCATION:ห้องประชุม ${escapeText(booking.roomId)} KMITL`,
       `DESCRIPTION:${escapeText(booking.notes)}`,
       'END:VEVENT',
       'END:VCALENDAR',
