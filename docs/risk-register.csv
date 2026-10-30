@@ -9,5 +9,5 @@ R-07,T-07,Dependency and workflow supply chain,3,5,15,CI CD lead,10,partial
 R-08,T-08,No trusted audit trail,4,3,12,Backend audit lead,12,open
 R-09,T-09,Concurrent booking writes,4,3,12,Backend booking lead,12,open
 R-10,,Language and scope mismatch with rubric,4,5,20,PM,20,open
-R-11,,Missing remote deployment evidence,4,5,20,CI CD lead,15,pending
+R-11,,Missing remote deployment evidence,4,5,20,CI CD lead,5,verified run 41059099454
 R-12,,Insufficient genuine collaboration evidence,4,4,16,PM team,16,open
