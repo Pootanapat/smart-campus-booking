@@ -1,0 +1,13 @@
+risk_id,threat_id,description,likelihood,impact,initial_score,owner_role,residual_score,status
+R-01,T-01,Booking rule bypass through app,3,3,9,Booking lead,3,mitigated in use cases
+R-02,T-02,Malformed or oversized saved data,3,3,9,Persistence lead,6,partial
+R-03,T-03,Stored XSS in meeting title,3,5,15,Frontend security lead,5,mitigated in tested rendering paths
+R-04,T-04,ICS injection and unsafe filenames,3,3,9,Export lead,3,mitigated
+R-05,T-05,Mock role lacks server authorization,5,4,20,Backend auth lead,20,open
+R-06,T-06,PII exposed in shared browser storage,4,4,16,Security privacy lead,12,open
+R-07,T-07,Dependency and workflow supply chain,3,5,15,CI CD lead,10,partial
+R-08,T-08,No trusted audit trail,4,3,12,Backend audit lead,12,open
+R-09,T-09,Concurrent booking writes,4,3,12,Backend booking lead,12,open
+R-10,,Language and scope mismatch with rubric,4,5,20,PM,20,open
+R-11,,Missing remote deployment evidence,4,5,20,CI CD lead,15,pending
+R-12,,Insufficient genuine collaboration evidence,4,4,16,PM team,16,open
