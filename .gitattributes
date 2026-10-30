@@ -1,0 +1,16 @@
+# คงรูปแบบบรรทัดของซอร์สโค้ดและเอกสารให้ตรงกันบน Windows และ CI
+*.ts text eol=lf
+*.tsx text eol=lf
+*.mjs text eol=lf
+*.md text eol=lf
+*.json text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.css text eol=lf
+*.webmanifest text eol=lf
+index.html text eol=lf
+.env.example text eol=lf
+.gitattributes text eol=lf
+*.png binary
+*.jpg binary
+*.zip binary
